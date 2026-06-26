@@ -1,0 +1,34 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# AI Assistant config
+.engineer-assistant/
+.ai-history/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Task data
+tasks.json
+
+# Claude Code internal config
+.claude/
+
+# AI agent configs (personal settings)
+.secretary/
+.customer-support-advisor/
+
+# Personal / business files (non-public)
+work/
+案件獲得/
+TEDDY_POO/
+memo.md
+セキュリティ対策実施報告書*.md
+
+# Skill files (internal)
+*.skill
+meeting-minutes-skill/
+meeting-minutes-workspace/
