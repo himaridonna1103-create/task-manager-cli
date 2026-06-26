@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>toco.</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f8f6;
+      color: #1a1a18;
+      line-height: 1.7;
+      padding: 0 1rem;
+    }
+
+    .container { max-width: 760px; margin: 0 auto; padding: 2rem 0 4rem; }
+
+    /* Hero */
+    .hero { padding: 3rem 0 2rem; text-align: center; }
+    .hero-badge {
+      display: inline-block;
+      background: #e6f1fb;
+      color: #185fa5;
+      font-size: 12px;
+      padding: 4px 14px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 600;
+      margin: 0 0 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    .hero p { font-size: 16px; color: #5f5e5a; margin: 0 0 1.75rem; }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: #1a1a18;
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-secondary {
+      background: transparent;
+      color: #1a1a18;
+      border: 0.5px solid #888780;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-primary:hover { background: #3c3c38; }
+    .btn-secondary:hover { background: #f1efe8; }
+
+    /* Terminal */
+    .terminal {
+      background: #1e1e2e;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 2rem 0;
+      text-align: left;
+    }
+    .terminal-bar { display: flex; gap: 6px; margin-bottom: 1rem; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .terminal code { display: block; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; }
+    .prompt { color: #89b4fa; }
+    .output { color: #cdd6f4; }
+    .success { color: #a6e3a1; }
+    .done { color: #f38ba8; }
+
+    /* Features */
+    .section-label {
+      font-size: 12px;
+      color: #888780;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 2rem 0 0.75rem;
+    }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 0 0 2rem; }
+    .feature-card {
+      background: #fff;
+      border: 0.5px solid #d3d1c7;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+    }
+    .feature-card i { font-size: 22px; color: #185fa5; margin-bottom: 8px; display: block; }
+    .feature-card h3 { font-size: 14px; font-weight: 500; margin: 0 0 4px; }
+    .feature-card p { font-size: 13px; color: #5f5e5a; margin: 0; }
+
+    /* Commands */
+    .cmd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 2rem; }
+    .cmd-card { background: #f1efe8; border-radius: 8px; padding: 0.75rem 1rem; }
+    .cmd-card code { font-family: 'Courier New', monospace; font-size: 13px; color: #185fa5; display: block; margin-bottom: 4px; }
+    .cmd-card span { font-size: 12px; color: #5f5e5a; }
+
+    /* Tags */
+    .stack { display: flex; gap: 8px; flex-wrap: wrap; margin: 0.5rem 0 2rem; }
+    .tag {
+      background: #f1efe8;
+      border: 0.5px solid #d3d1c7;
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: 13px;
+      color: #5f5e5a;
+    }
+
+    /* Install */
+    .install-box {
+      background: #fff;
+      border: 0.5px solid #d3d1c7;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .install-box pre {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #1a1a18;
+      background: #f1efe8;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      overflow-x: auto;
+    }
+
+    hr { border: none; border-top: 0.5px solid #d3d1c7; margin: 2rem 0; }
+
+    footer { text-align: center; font-size: 13px; color: #888780; padding: 1rem 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-badge"><i class="ti ti-terminal-2"></i> CLI アプリ</div>
+      <h1>toco.</h1>
+      <p>シンプルなPython製CLIツール。タスクを追加・完了・削除して、<br>JSONで自動保存。依存ライブラリ不要。</p>
+      <div class="hero-btns">
+        <a class="btn-primary" href="task_manager.py">コードを見る</a>
+        <a class="btn-secondary" href="README.md">README</a>
+      </div>
+    </div>
+
+    <!-- Terminal -->
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#febc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+      </div>
+      <code>
+        <span class="prompt">$ python -X utf8 task_manager.py</span><br>
+        <span class="output">=== toco. ===</span><br>
+        <span class="output">コマンド: add / list / done / delete / quit</span><br><br>
+        <span class="prompt">&gt; add 買い物をする</span><br>
+        <span class="success">追加しました: 買い物をする</span><br>
+        <span class="prompt">&gt; list</span><br>
+        <span class="output">⬜ [1] 買い物をする</span><br>
+        <span class="prompt">&gt; done 1</span><br>
+        <span class="success">完了しました: 買い物をする</span><br>
+        <span class="prompt">&gt; list</span><br>
+        <span class="done">✅ [1] 買い物をする</span>
+      </code>
+    </div>
+
+    <!-- Features -->
+    <div class="section-label">特徴</div>
+    <div class="features">
+      <div class="feature-card">
+        <i class="ti ti-database"></i>
+        <h3>自動保存</h3>
+        <p>JSONファイルに保存。再起動してもデータが残る。</p>
+      </div>
+      <div class="feature-card">
+        <i class="ti ti-shield-check"></i>
+        <h3>安全設計</h3>
+        <p>エラーハンドリング・入力バリデーション済み。</p>
+      </div>
+      <div class="feature-card">
+        <i class="ti ti-package"></i>
+        <h3>依存ゼロ</h3>
+        <p>標準ライブラリのみ。pip install 不要。</p>
+      </div>
+      <div class="feature-card">
+        <i class="ti ti-test-pipe"></i>
+        <h3>テスト済み</h3>
+        <p>pytestでAAAパターンのテスト実装済み。</p>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Commands -->
+    <div class="section-label">コマンド一覧</div>
+    <div class="cmd-grid">
+      <div class="cmd-card"><code>add &lt;タイトル&gt;</code><span>タスクを追加する</span></div>
+      <div class="cmd-card"><code>list</code><span>一覧を表示する</span></div>
+      <div class="cmd-card"><code>done &lt;ID&gt;</code><span>タスクを完了にする</span></div>
+      <div class="cmd-card"><code>delete &lt;ID&gt;</code><span>タスクを削除する</span></div>
+      <div class="cmd-card"><code>quit</code><span>アプリを終了する</span></div>
+    </div>
+
+    <!-- Install -->
+    <div class="section-label">インストール</div>
+    <div class="install-box">
+      <p style="font-size:14px; color:#5f5e5a;">追加ライブラリ不要。Python 3.8以上があれば動きます。</p>
+      <pre>python -X utf8 task_manager.py</pre>
+    </div>
+
+    <!-- Stack -->
+    <div class="section-label">技術スタック</div>
+    <div class="stack">
+      <span class="tag"><i class="ti ti-brand-python"></i> Python 3.8+</span>
+      <span class="tag"><i class="ti ti-file-code"></i> JSON</span>
+      <span class="tag"><i class="ti ti-test-pipe"></i> pytest</span>
+      <span class="tag"><i class="ti ti-brand-git"></i> Git</span>
+      <span class="tag">Windows / macOS / Linux</span>
+    </div>
+
+    <footer>MIT License · toco.</footer>
+  </div>
+</body>
+</html>
