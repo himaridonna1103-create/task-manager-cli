@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>tango. ｜ 英単語学習アプリ</title>
 <style>
   :root{
@@ -174,7 +174,8 @@
     </div>
     <div class="box">
       <h2>💾 データのバックアップ・共有</h2>
-      <p class="muted">データはこのスマホ（ブラウザ）の中だけに保存されます。単語帳をファイルに書き出して、生徒さんに配ったり別の端末に移したりできます。</p>
+      <p class="muted">データはこのスマホ（ブラウザ）の中だけに保存されます。単語帳をファイルに書き出して、生徒さんに配ったり別の端末に移したりできます。<br>
+      ⚠️ iPhoneのSafariでは<b>1週間以上開かないとデータが自動で消えることがあります</b>。ときどき「書き出す」でバックアップしておくと安心です。プライベートモードでは保存されません。</p>
       <button class="btn small sub" onclick="exportData()">単語帳を書き出す（保存）</button>
       <button class="btn small ghost" onclick="document.getElementById('imp-file').click()">単語帳を読み込む</button>
       <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importData(this)">
@@ -590,7 +591,10 @@ function migrate(){
   save();
 }
 function prStars(p){ return p===1 ? "★★★" : p===3 ? "★" : "★★"; }
-function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ toast("保存できませんでした（プライベートモードや容量不足の可能性があります）"); }
+}
 function st(id){ if(!S.stats[id]) S.stats[id]={seen:0,miss:0,forgot:false}; return S.stats[id]; }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function ensureDaily(){ const t=todayStr(); if(S.daily.date!==t){ S.daily={date:t,doneIds:[],ok:0,ng:0}; save(); } }
@@ -698,7 +702,7 @@ function renderCard(){
       <span class="imgtag ${img[0]}">${img[1]}</span>
       <div class="word">${esc(x.en)}</div>
       ${x.pos?`<div class="pos">${esc(x.pos)}</div>`:""}
-      <button class="speak-btn" onclick="event.stopPropagation();speak('${jsq(x.en)}')">🔊 音を聞く</button>
+      <button class="speak-btn" onclick="event.stopPropagation();speak('${esc(jsq(x.en))}')">🔊 音を聞く</button>
       <div id="card-back">${revealed ? backHTML(x) : '<div class="hint">タップして意味を見る</div>'}</div>
     </div>
     <div class="judge" id="judge" style="visibility:${revealed?"visible":"hidden"}">
@@ -740,11 +744,13 @@ function backHome(){
 
 /* ---------- 音声 ---------- */
 function speak(text){
-  if(!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-US"; u.rate = 0.9;
-  speechSynthesis.speak(u);
+  try{
+    if(!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US"; u.rate = 0.9;
+    speechSynthesis.speak(u);
+  }catch(e){ /* 音声はベストエフォート（端末により自動再生が効かないことがある） */ }
 }
 
 /* ---------- 単語帳 ---------- */
@@ -772,7 +778,7 @@ function renderWords(){
         チェック回数: ${s.seen} ／ ×の回数: ${s.miss}
         <br><button class="del" style="color:#b98a2f;border-color:#d9a53f" onclick="event.stopPropagation();cyclePr(${x.id})">優先度をかえる</button>
         <button class="del" onclick="event.stopPropagation();delWord(${x.id})">この単語を削除</button>
-        <button class="del" style="color:var(--accent-dark);border-color:var(--accent)" onclick="event.stopPropagation();speak('${jsq(x.en)}')">🔊 発音</button>
+        <button class="del" style="color:var(--accent-dark);border-color:var(--accent)" onclick="event.stopPropagation();speak('${esc(jsq(x.en))}')">🔊 発音</button>
       </div>
     </div>`;
   }).join("") || `<p class="muted" style="text-align:center;padding:20px;">見つかりませんでした</p>`;
@@ -815,7 +821,7 @@ function bulkAdd(){
   for(const line of lines){
     const parts = line.split(/\t|,|、/).map(p=>p.trim()).filter(Boolean);
     if(parts.length < 2) continue;
-    S.words.push({ id:S.nextId++, en:parts[0], ja:parts[1], pos:parts[2]||"", img:0, ex:parts[3]||"", fam:"", ant:"" });
+    S.words.push({ id:S.nextId++, en:parts[0], ja:parts[1], pos:parts[2]||"", img:0, pr:2, ex:parts[3]||"", fam:"", ant:"" });
     n++;
   }
   save();
@@ -850,9 +856,32 @@ function importData(input){
     try{
       const d = JSON.parse(r.result);
       if(!d || !Array.isArray(d.words)) throw 0;
-      if(!confirm(`${d.words.length} 語のデータを読み込みます。今のデータは上書きされます。よろしいですか？`)) return;
-      S = d; if(!S.stats) S.stats={}; if(!S.daily) S.daily={date:"",doneIds:[],ok:0,ng:0};
-      if(!S.nextId) S.nextId = Math.max(0,...S.words.map(x=>x.id||0))+1;
+      // 外部から来たデータはゼロトラストで1語ずつ検証・正規化してから取り込む
+      const words = [], idMap = {};
+      let nid = 1;
+      for(const x of d.words){
+        if(!x || typeof x !== "object") continue;
+        const en = String(x.en ?? "").trim(), ja = String(x.ja ?? "").trim();
+        if(!en || !ja) continue;
+        const img = [-1,0,1].includes(Number(x.img)) ? Number(x.img) : 0;
+        const pr  = [1,2,3].includes(Number(x.pr)) ? Number(x.pr) : 2;
+        const id = nid++;
+        if(x.id != null) idMap[x.id] = id;
+        words.push({ id, en, ja, pos: String(x.pos ?? ""), img, pr,
+                     ex: String(x.ex ?? ""), fam: String(x.fam ?? ""), ant: String(x.ant ?? "") });
+      }
+      if(!words.length) throw 0;
+      if(!confirm(`${words.length} 語のデータを読み込みます。今のデータは上書きされます。よろしいですか？`)){ input.value=""; return; }
+      const stats = {};
+      if(d.stats && typeof d.stats === "object" && !Array.isArray(d.stats)){
+        for(const k in d.stats){
+          const s = d.stats[k], id = idMap[k];
+          if(!id || !s || typeof s !== "object") continue;
+          stats[id] = { seen: Number(s.seen)||0, miss: Number(s.miss)||0, forgot: !!s.forgot };
+        }
+      }
+      const startDate = /^\d{4}-\d{2}-\d{2}$/.test(String(d.startDate)) ? d.startDate : null;
+      S = { v:3, words, nextId: nid, stats, startDate, daily:{date:"", doneIds:[], ok:0, ng:0} };
       save(); renderHome(); toast("読み込みました");
     }catch(e){ toast("読み込めませんでした（ファイルを確認してください）"); }
     input.value = "";
