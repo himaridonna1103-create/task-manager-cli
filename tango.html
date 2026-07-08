@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>tango. ｜ 英単語学習アプリ</title>
+<style>
+  :root{
+    --bg:#faf7f2; --card:#ffffff; --ink:#4a4a4a; --sub:#9b9b9b;
+    --accent:#7fb69b; --accent-dark:#5f9a7e; --pink:#e8a0a8; --blue:#8fb8d8;
+    --yellow:#f2d27f; --line:#eee5d8; --danger:#d9838c;
+    --plus:#e8f5ee; --plus-ink:#3d8b63; --minus:#fdeaea; --minus-ink:#c05f6a;
+    --neutral:#f0f0ee; --neutral-ink:#8a8a85;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;padding-bottom:76px;}
+  header{padding:18px 20px 10px;display:flex;align-items:baseline;gap:10px;}
+  header h1{font-size:26px;letter-spacing:1px;color:var(--accent-dark);}
+  header p{font-size:12px;color:var(--sub);}
+  main{padding:0 16px;max-width:560px;margin:0 auto;}
+
+  .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:50;}
+  .tabbar button{flex:1;padding:10px 0 12px;border:none;background:none;font-size:11px;color:var(--sub);cursor:pointer;}
+  .tabbar button .ico{display:block;font-size:20px;margin-bottom:2px;}
+  .tabbar button.on{color:var(--accent-dark);font-weight:bold;}
+
+  .panel{display:none;}
+  .panel.on{display:block;}
+
+  .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
+  .box h2{font-size:14px;color:var(--accent-dark);margin-bottom:10px;}
+  .muted{color:var(--sub);font-size:12px;line-height:1.7;}
+
+  .week-badge{display:inline-block;background:var(--accent);color:#fff;border-radius:999px;padding:4px 14px;font-size:13px;font-weight:bold;margin-bottom:8px;}
+  .big-num{font-size:30px;font-weight:bold;color:var(--accent-dark);}
+  .stat-row{display:flex;gap:10px;margin-top:10px;}
+  .stat{flex:1;background:var(--bg);border-radius:12px;padding:10px;text-align:center;}
+  .stat .v{font-size:20px;font-weight:bold;}
+  .stat .l{font-size:11px;color:var(--sub);margin-top:2px;}
+
+  .btn{display:block;width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;font-weight:bold;cursor:pointer;background:var(--accent);color:#fff;margin-top:10px;}
+  .btn.sub{background:var(--blue);}
+  .btn.ghost{background:var(--card);color:var(--accent-dark);border:2px solid var(--accent);}
+  .btn.small{padding:9px;font-size:13px;border-radius:10px;margin-top:8px;}
+  .btn.danger{background:var(--danger);}
+  .btn:disabled{opacity:.4;}
+
+  /* flashcard */
+  .prog{font-size:12px;color:var(--sub);text-align:center;margin:6px 0;}
+  .progbar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+  .progbar div{height:100%;background:var(--accent);transition:width .2s;}
+  .fcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 18px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.04);}
+  .fcard .imgtag{font-size:11px;border-radius:999px;padding:3px 12px;margin-bottom:12px;}
+  .imgtag.p{background:var(--plus);color:var(--plus-ink);}
+  .imgtag.m{background:var(--minus);color:var(--minus-ink);}
+  .imgtag.n{background:var(--neutral);color:var(--neutral-ink);}
+  .fcard .word{font-size:34px;font-weight:bold;letter-spacing:.5px;word-break:break-word;}
+  .fcard .pos{font-size:12px;color:var(--sub);margin-top:6px;}
+  .fcard .hint{font-size:12px;color:var(--sub);margin-top:22px;}
+  .fcard .ja{font-size:22px;font-weight:bold;color:var(--accent-dark);margin-top:14px;}
+  .fcard .detail{margin-top:14px;font-size:13px;line-height:1.8;color:var(--ink);text-align:left;width:100%;background:var(--bg);border-radius:12px;padding:12px;}
+  .fcard .detail b{color:var(--accent-dark);}
+  .speak-btn{margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:8px 20px;font-size:14px;cursor:pointer;}
+  .judge{display:flex;gap:10px;margin-top:14px;}
+  .judge button{flex:1;padding:16px;border:none;border-radius:14px;font-size:16px;font-weight:bold;cursor:pointer;}
+  .judge .ok{background:var(--plus);color:var(--plus-ink);}
+  .judge .ng{background:var(--minus);color:var(--minus-ink);}
+  .forgot-mark{font-size:11px;color:var(--minus-ink);background:var(--minus);border-radius:999px;padding:2px 10px;margin-bottom:10px;}
+
+  /* word list */
+  input[type=text],textarea,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:#fff;color:var(--ink);}
+  textarea{min-height:90px;font-family:inherit;}
+  label{display:block;font-size:12px;color:var(--sub);margin:10px 0 4px;}
+  .wrow{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;}
+  .wrow .top{display:flex;align-items:center;gap:8px;}
+  .wrow .en{font-weight:bold;font-size:16px;}
+  .wrow .ja2{color:var(--sub);font-size:13px;margin-left:auto;text-align:right;}
+  .badge-ng{font-size:10px;background:var(--minus);color:var(--minus-ink);border-radius:999px;padding:2px 8px;}
+  .pr{font-size:11px;color:#d9a53f;letter-spacing:1px;}
+  .wrow .exp{display:none;margin-top:10px;font-size:13px;line-height:1.8;border-top:1px dashed var(--line);padding-top:8px;}
+  .wrow.open .exp{display:block;}
+  .wrow .exp .del{color:var(--danger);background:none;border:1px solid var(--danger);border-radius:8px;padding:5px 14px;font-size:12px;margin-top:8px;cursor:pointer;}
+  .done-msg{text-align:center;padding:40px 10px;}
+  .done-msg .emoji{font-size:44px;}
+  .done-msg p{margin-top:10px;font-size:15px;line-height:1.8;}
+  details.help{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:14px;}
+  details.help summary{font-size:13px;font-weight:bold;color:var(--accent-dark);cursor:pointer;}
+  details.help .muted{margin-top:8px;}
+  .toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:9px 22px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;}
+  .toast.show{opacity:.92;}
+</style>
+</head>
+<body>
+<header>
+  <h1>tango.</h1>
+  <p>くり返しで覚える英単語</p>
+</header>
+
+<main>
+  <!-- ホーム -->
+  <section class="panel on" id="p-home">
+    <details class="help">
+      <summary>📘 このアプリの使い方（学習法）</summary>
+      <p class="muted">
+        「1ヶ月300語＝1日10語ずつ」は忘れてしまうのでNG！<br>
+        <b>同じ100語を1週間毎日くり返す</b>のがコツです。<br><br>
+        ・1週目：優先度 ★★★ の単語（約100語）を毎日<br>
+        ・2週目：優先度 ★★ の単語を毎日<br>
+        ・3週目：優先度 ★ の単語を毎日<br>
+        ・4週目：全部を毎日 ＋ 忘れた単語を重点的に<br><br>
+        優先度は「試験によく出る・すぐ使える順」につけてあります。
+        単語帳タブでいつでも変えられます。<br><br>
+        カードをめくって「覚えてた○／忘れてた×」をタップするだけ。
+        ×にした単語は自動で記録されて、優先的に出てきます。<br><br>
+        覚えるときの3ステップ：<br>
+        ① 🔊 音を聞く<br>
+        ② ＋か−のイメージをつかむ<br>
+        ③ フレーズ（例文）ごと覚える
+      </p>
+    </details>
+
+    <div class="box" id="home-status"></div>
+
+    <button class="btn" onclick="startStudy()">📖 今日の学習をはじめる</button>
+    <button class="btn sub" id="btn-review" onclick="startReview()">🔁 忘れた単語だけ復習する</button>
+  </section>
+
+  <!-- 学習 / 復習 共通 -->
+  <section class="panel" id="p-study">
+    <div id="study-area"></div>
+  </section>
+
+  <!-- 単語帳 -->
+  <section class="panel" id="p-words">
+    <div class="box">
+      <h2>🔍 単語をさがす</h2>
+      <input type="text" id="search" placeholder="英語 or 日本語で検索" oninput="renderWords()">
+      <p class="muted" id="word-count" style="margin-top:8px;"></p>
+    </div>
+    <div id="word-list"></div>
+  </section>
+
+  <!-- 追加 -->
+  <section class="panel" id="p-add">
+    <div class="box">
+      <h2>✏️ 1語ずつ追加</h2>
+      <label>英単語（必須）</label><input type="text" id="a-en" placeholder="promote">
+      <label>意味（必須）</label><input type="text" id="a-ja" placeholder="昇進させる・促進する">
+      <label>品詞</label>
+      <select id="a-pos"><option value="">えらぶ</option><option>動詞</option><option>名詞</option><option>形容詞</option><option>副詞</option><option>熟語</option><option>その他</option></select>
+      <label>イメージ</label>
+      <select id="a-img"><option value="0">± どちらでもない</option><option value="1">＋ ポジティブ</option><option value="-1">− ネガティブ</option></select>
+      <label>優先度（学習する週が決まります）</label>
+      <select id="a-pr"><option value="1">★★★ 高（1週目）</option><option value="2" selected>★★ 中（2週目）</option><option value="3">★ 低（3週目）</option></select>
+      <label>フレーズ・例文</label><input type="text" id="a-ex" placeholder="be promoted to manager">
+      <label>品詞ファミリー（変化形）</label><input type="text" id="a-fam" placeholder="promotion(名) / promotional(形)">
+      <label>反意語・反対表現</label><input type="text" id="a-ant" placeholder="demote">
+      <button class="btn small" onclick="addWord()">追加する</button>
+    </div>
+    <div class="box">
+      <h2>📋 まとめて追加（1行1語）</h2>
+      <p class="muted">「英単語, 意味」のように書いてください。カンマの代わりにタブでもOK。<br>例：happy, 幸せな</p>
+      <textarea id="bulk" placeholder="happy, 幸せな&#10;lucky, 運のいい"></textarea>
+      <button class="btn small" onclick="bulkAdd()">まとめて追加する</button>
+    </div>
+  </section>
+
+  <!-- 設定 -->
+  <section class="panel" id="p-set">
+    <div class="box">
+      <h2>📅 学習サイクル</h2>
+      <p class="muted" id="cycle-info"></p>
+      <button class="btn small ghost" onclick="resetCycle()">サイクルを1週目からやり直す</button>
+    </div>
+    <div class="box">
+      <h2>💾 データのバックアップ・共有</h2>
+      <p class="muted">データはこのスマホ（ブラウザ）の中だけに保存されます。単語帳をファイルに書き出して、生徒さんに配ったり別の端末に移したりできます。</p>
+      <button class="btn small sub" onclick="exportData()">単語帳を書き出す（保存）</button>
+      <button class="btn small ghost" onclick="document.getElementById('imp-file').click()">単語帳を読み込む</button>
+      <input type="file" id="imp-file" accept=".json" style="display:none" onchange="importData(this)">
+    </div>
+    <div class="box">
+      <h2>⚠️ リセット</h2>
+      <button class="btn small danger" onclick="resetAll()">すべてのデータを消す</button>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar">
+  <button class="on" data-p="p-home" onclick="tab(this)"><span class="ico">🏠</span>ホーム</button>
+  <button data-p="p-words" onclick="tab(this)"><span class="ico">📚</span>単語帳</button>
+  <button data-p="p-add" onclick="tab(this)"><span class="ico">✏️</span>追加</button>
+  <button data-p="p-set" onclick="tab(this)"><span class="ico">⚙️</span>設定</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const KEY = "tango-app-v1";
+
+/* ---------- サンプル単語（TOEIC・試験頻出 100語） ---------- */
+function w(en, ja, pos, img, ex, fam, ant, pr){ return {en, ja, pos, img, ex: ex||"", fam: fam||"", ant: ant||"", pr: pr||0}; }
+const SAMPLE = [
+w("add","加える","動詞",0,"add some sugar","addition(名) / additional(形) / additionally(副)"),
+w("promote","昇進させる・促進する","動詞",1,"be promoted to manager","promotion(名) / promotional(形)","demote"),
+w("communicate","伝える・やり取りする","動詞",0,"communicate with customers","communication(名)"),
+w("fortunate","幸運な","形容詞",1,"a fortunate result","fortune(名) / fortunately(副)","unfortunate"),
+w("possible","可能な","形容詞",1,"as soon as possible","possibility(名) / possibly(副)","impossible"),
+w("careful","注意深い","形容詞",1,"Be careful with the glass.","care(名) / carefully(副)","careless"),
+w("useful","役に立つ","形容詞",1,"useful information","use(動) / usefully(副)","useless"),
+w("agree","同意する","動詞",1,"I agree with you.","agreement(名)","disagree"),
+w("translate","翻訳する","動詞",0,"translate English into Japanese","translation(名) / translator(名)"),
+w("transport","輸送する","動詞",0,"transport goods by ship","transportation(名)"),
+w("improve","改善する・上達する","動詞",1,"improve my English","improvement(名)"),
+w("increase","増える・増やす","動詞",0,"increase by 10%","increasingly(副)","decrease"),
+w("decrease","減る・減らす","動詞",0,"decrease in sales","","increase"),
+w("provide","提供する","動詞",1,"provide free Wi-Fi","provision(名) / provider(名)"),
+w("offer","申し出る・提供する","動詞",1,"offer a discount","offering(名)"),
+w("receive","受け取る","動詞",0,"receive an email","receipt(名/レシート) / reception(名)"),
+w("reduce","減らす","動詞",0,"reduce costs","reduction(名)"),
+w("require","必要とする・求める","動詞",0,"Experience is required.","requirement(名)"),
+w("attend","出席する","動詞",0,"attend a meeting","attendance(名) / attendee(名/出席者)"),
+w("available","利用できる・手が空いている","形容詞",1,"Are you available tomorrow?","availability(名)","unavailable"),
+w("schedule","予定・予定を組む","名詞",0,"a busy schedule","scheduled(形)"),
+w("delay","遅れ・遅らせる","名詞",-1,"The flight was delayed.",""),
+w("cancel","中止する・取り消す","動詞",-1,"cancel the reservation","cancellation(名)"),
+w("confirm","確認する","動詞",1,"confirm your booking","confirmation(名)"),
+w("deliver","配達する・届ける","動詞",0,"deliver a package","delivery(名)"),
+w("purchase","購入する・購入","動詞",0,"purchase a ticket online",""),
+w("refund","返金・払い戻す","名詞",0,"get a full refund",""),
+w("discount","割引","名詞",1,"a 20% discount",""),
+w("employee","従業員","名詞",0,"train new employees","employ(動) / employer(名/雇い主) / employment(名)"),
+w("customer","顧客・お客様","名詞",0,"customer service",""),
+w("client","取引先・依頼客","名詞",0,"meet a client",""),
+w("conference","会議・大会","名詞",0,"attend a conference",""),
+w("document","書類・文書","名詞",0,"sign the document",""),
+w("contract","契約・契約書","名詞",0,"sign a contract",""),
+w("invoice","請求書","名詞",0,"send an invoice",""),
+w("budget","予算","名詞",0,"within the budget",""),
+w("expense","費用・経費","名詞",-1,"cut expenses","expensive(形/高価な)"),
+w("profit","利益","名詞",1,"make a profit","profitable(形)","loss"),
+w("salary","給料","名詞",0,"raise his salary",""),
+w("hire","雇う","動詞",1,"hire new staff","","fire(解雇する)"),
+w("retire","退職する・引退する","動詞",0,"retire at 65","retirement(名)"),
+w("resign","辞職する","動詞",-1,"resign from the company","resignation(名)"),
+w("apply","申し込む・応募する","動詞",0,"apply for the job","application(名) / applicant(名/応募者)"),
+w("interview","面接・面接する","名詞",0,"a job interview","interviewer(名)"),
+w("experience","経験","名詞",0,"work experience","experienced(形/経験豊富な)"),
+w("skill","技能・スキル","名詞",1,"communication skills","skilled(形) / skillful(形)"),
+w("ability","能力","名詞",1,"the ability to speak English","able(形)","inability"),
+w("opportunity","機会・チャンス","名詞",1,"a great opportunity",""),
+w("decide","決める","動詞",0,"decide to move","decision(名) / decisive(形)"),
+w("suggest","提案する","動詞",0,"suggest a new plan","suggestion(名)"),
+w("recommend","すすめる","動詞",1,"recommend this restaurant","recommendation(名)"),
+w("announce","発表する","動詞",0,"announce the results","announcement(名)"),
+w("introduce","紹介する・導入する","動詞",0,"introduce myself","introduction(名)"),
+w("prepare","準備する","動詞",0,"prepare for the exam","preparation(名)"),
+w("complete","完成させる・完全な","動詞",1,"complete the form","completion(名) / completely(副)","incomplete"),
+w("submit","提出する","動詞",0,"submit a report by Friday","submission(名)"),
+w("deadline","締め切り","名詞",-1,"meet the deadline",""),
+w("extend","延長する","動詞",0,"extend the deadline","extension(名)"),
+w("expand","拡大する","動詞",1,"expand the business","expansion(名)"),
+w("launch","発売する・開始する","動詞",1,"launch a new product",""),
+w("develop","開発する・発達する","動詞",1,"develop a new app","development(名) / developer(名)"),
+w("produce","生産する","動詞",0,"produce cars","product(名/製品) / production(名) / producer(名)"),
+w("manufacture","製造する","動詞",0,"manufacture parts","manufacturer(名/メーカー)"),
+w("equipment","設備・機器","名詞",0,"office equipment","equip(動)"),
+w("facility","施設","名詞",0,"sports facilities",""),
+w("maintain","維持する・整備する","動詞",0,"maintain the machine","maintenance(名)"),
+w("repair","修理する・修理","動詞",0,"repair the roof",""),
+w("replace","取り替える","動詞",0,"replace the battery","replacement(名)"),
+w("install","設置する・インストールする","動詞",0,"install the software","installation(名)"),
+w("update","更新する・最新情報","動詞",0,"update the app",""),
+w("review","見直す・レビュー","動詞",0,"review the report","reviewer(名)"),
+w("feedback","意見・フィードバック","名詞",0,"give feedback",""),
+w("survey","調査・アンケート","名詞",0,"answer the survey",""),
+w("result","結果","名詞",0,"the test results","resulting(形)"),
+w("effective","効果的な","形容詞",1,"an effective way","effect(名/効果) / effectively(副)","ineffective"),
+w("efficient","効率的な","形容詞",1,"an efficient system","efficiency(名) / efficiently(副)","inefficient"),
+w("convenient","便利な・都合がよい","形容詞",1,"a convenient location","convenience(名/コンビニのconvenience store)","inconvenient"),
+w("comfortable","快適な","形容詞",1,"a comfortable sofa","comfort(名)","uncomfortable"),
+w("satisfy","満足させる","動詞",1,"satisfy the customers","satisfaction(名) / satisfied(形)","dissatisfy"),
+w("disappoint","がっかりさせる","動詞",-1,"I was disappointed with the result.","disappointment(名)"),
+w("environment","環境","名詞",0,"protect the environment","environmental(形)"),
+w("participate","参加する","動詞",1,"participate in the event","participant(名/参加者) / participation(名)"),
+w("register","登録する","動詞",0,"register for the class","registration(名)"),
+w("reserve","予約する","動詞",0,"reserve a table for two","reservation(名)"),
+w("avoid","避ける","動詞",-1,"avoid rush hour",""),
+w("prevent","防ぐ","動詞",1,"prevent accidents","prevention(名)"),
+w("solve","解決する","動詞",1,"solve the problem","solution(名)"),
+w("due","期限がきて・〜のせいで","形容詞",0,"The report is due Monday. / due to the rain",""),
+w("current","現在の","形容詞",0,"the current situation","currently(副/現在は)"),
+w("previous","前の・以前の","形容詞",0,"the previous meeting","previously(副)","following"),
+w("recent","最近の","形容詞",0,"a recent study","recently(副)"),
+w("several","いくつかの","形容詞",0,"several times",""),
+w("various","さまざまな","形容詞",0,"various reasons","variety(名) / vary(動)"),
+w("entire","全体の","形容詞",0,"the entire team","entirely(副)"),
+w("additional","追加の","形容詞",0,"an additional fee","add(動) / addition(名)"),
+w("appropriate","適切な","形容詞",1,"appropriate clothes","","inappropriate"),
+w("immediately","すぐに","副詞",0,"Please reply immediately.","immediate(形)"),
+w("approximately","およそ・約","副詞",0,"approximately 30 minutes","approximate(形)"),
+w("bilingual","2か国語を話せる","形容詞",1,"a bilingual guide","bi=2：bicycle / trilingual(3か国語)"),
+];
+
+/* ---------- 追加サンプル 201語（pr: 1=★★★最優先 / 2=★★ / 3=★） ---------- */
+const SAMPLE2 = [
+// ===== 優先度★★★（1週目）=====
+w("accept","受け入れる","動詞",1,"accept the offer","acceptance(名)","refuse",1),
+w("refuse","断る","動詞",-1,"refuse the request","refusal(名)","accept",1),
+w("allow","許可する","動詞",1,"Pets are allowed here.","","forbid(禁じる)",1),
+w("arrive","到着する","動詞",0,"arrive at the airport","arrival(名)","depart(出発する)",1),
+w("borrow","借りる","動詞",0,"borrow a pen","","lend",1),
+w("lend","貸す","動詞",0,"lend her my umbrella","","borrow",1),
+w("compare","比べる","動詞",0,"compare the two plans","comparison(名)","",1),
+w("complain","不満を言う","動詞",-1,"complain about the service","complaint(名/クレーム)","",1),
+w("consider","よく考える・検討する","動詞",0,"consider the offer","consideration(名)","",1),
+w("continue","続ける","動詞",0,"continue the lesson","continuous(形) / continuously(副)","",1),
+w("create","作り出す","動詞",1,"create a new menu","creation(名) / creative(形)","",1),
+w("discuss","話し合う","動詞",0,"discuss the schedule","discussion(名)","",1),
+w("expect","予想する・期待する","動詞",0,"expect a big crowd","expectation(名)","",1),
+w("explain","説明する","動詞",0,"explain the reason","explanation(名)","",1),
+w("fail","失敗する","動詞",-1,"fail the test","failure(名)","succeed",1),
+w("succeed","成功する","動詞",1,"succeed in business","success(名) / successful(形)","fail",1),
+w("follow","従う・あとに続く","動詞",0,"follow the instructions","following(形/次の)","",1),
+w("happen","起こる","動詞",0,"What happened last night?","","",1),
+w("include","含む","動詞",0,"The price includes tax.","including(前/〜を含めて)","exclude",1),
+w("invite","招待する","動詞",1,"invite her to dinner","invitation(名)","",1),
+w("notice","気づく・掲示","動詞",0,"notice a small change","","",1),
+w("prefer","〜のほうを好む","動詞",1,"prefer dogs to cats","preference(名)","",1),
+w("promise","約束する","動詞",1,"promise to be on time","","",1),
+w("protect","守る","動詞",1,"protect the animals","protection(名)","",1),
+w("realize","気づく・実現する","動詞",0,"realize my dream","","",1),
+w("share","共有する・分け合う","動詞",1,"share the photos","","",1),
+w("support","支える・応援する","動詞",1,"support the team","supporter(名)","",1),
+w("worry","心配する","動詞",-1,"Don't worry about it.","","",1),
+w("amount","量・金額","名詞",0,"a large amount of water","","",1),
+w("appointment","（面会・病院の）予約・約束","名詞",0,"make an appointment","","",1),
+w("attention","注意","名詞",0,"pay attention to the sign","","",1),
+w("benefit","利益・恩恵","名詞",1,"the benefits of exercise","beneficial(形)","",1),
+w("bill","請求書・紙幣","名詞",0,"pay the bill","","",1),
+w("chance","機会・見込み","名詞",1,"a chance to win","","",1),
+w("choice","選択","名詞",0,"make a choice","choose(動) / chose-chosen","",1),
+w("colleague","同僚","名詞",0,"a colleague from work","","",1),
+w("condition","状態・条件","名詞",0,"in good condition","","",1),
+w("effort","努力","名詞",1,"make an effort","","",1),
+w("fee","料金・手数料","名詞",0,"an entrance fee","","",1),
+w("goal","目標","名詞",1,"set a goal","","",1),
+w("health","健康","名詞",1,"good for your health","healthy(形)","",1),
+w("income","収入","名詞",0,"extra income","","",1),
+w("issue","問題・課題","名詞",0,"a serious issue","","",1),
+w("item","品物・項目","名詞",0,"check every item","","",1),
+w("knowledge","知識","名詞",1,"knowledge of animals","know(動)","",1),
+w("opinion","意見","名詞",0,"in my opinion","","",1),
+w("option","選択肢","名詞",0,"have no option","optional(形/自由選択の)","",1),
+w("patient","患者（名）／がまん強い（形）","名詞",0,"examine a patient","patience(名/忍耐)","impatient",1),
+w("price","値段","名詞",0,"a reasonable price","","",1),
+w("purpose","目的","名詞",0,"the purpose of this trip","","",1),
+w("quality","質","名詞",0,"high-quality food","","quantity(量)",1),
+w("reason","理由","名詞",0,"the reason for being late","reasonable(形/妥当な・手頃な)","",1),
+w("rule","規則","名詞",0,"break the rules","","",1),
+w("safety","安全","名詞",1,"safety first","safe(形) / safely(副)","danger(危険)",1),
+w("staff","職員・スタッフ","名詞",0,"a staff meeting","","",1),
+w("tax","税金","名詞",0,"including tax","","",1),
+w("value","価値","名詞",1,"the value of teamwork","valuable(形/貴重な)","",1),
+w("cheap","安い","形容詞",0,"a cheap flight","","expensive",1),
+w("look forward to","〜を楽しみに待つ","熟語",1,"I look forward to seeing you.","toの後は名詞/〜ing","",1),
+w("find out","（調べて）知る・わかる","熟語",0,"find out the truth","","",1),
+w("give up","あきらめる","熟語",-1,"Don't give up!","","",1),
+w("on time","時間どおりに","熟語",1,"arrive on time","in time(間に合って)","",1),
+w("at least","少なくとも","熟語",0,"at least once a week","","at most(多くても)",1),
+w("in advance","前もって","熟語",0,"book two weeks in advance","","",1),
+w("according to","〜によると","熟語",0,"according to the news","","",1),
+// ===== 優先度★★（2週目）=====
+w("achieve","達成する","動詞",1,"achieve the goal","achievement(名)","",2),
+w("advise","助言する","動詞",1,"advise him to rest","advice(名/アドバイス)","",2),
+w("afford","〜する余裕がある","動詞",0,"can't afford a new car","affordable(形/手頃な)","",2),
+w("appreciate","感謝する・価値を認める","動詞",1,"I appreciate your help.","appreciation(名)","",2),
+w("arrange","手配する・整える","動詞",0,"arrange a meeting","arrangement(名)","",2),
+w("assist","手伝う","動詞",1,"assist the doctor","assistant(名/助手) / assistance(名)","",2),
+w("attract","引きつける","動詞",1,"attract many tourists","attraction(名) / attractive(形/魅力的な)","",2),
+w("celebrate","祝う","動詞",1,"celebrate her birthday","celebration(名)","",2),
+w("charge","請求する・充電する","動詞",0,"charge a fee / charge my phone","","",2),
+w("compete","競争する","動詞",0,"compete with rivals","competition(名) / competitive(形)","",2),
+w("concentrate","集中する","動詞",0,"concentrate on the task","concentration(名)","",2),
+w("contain","含んでいる","動詞",0,"This food contains sugar.","container(名/容器)","",2),
+w("damage","損害を与える・損害","動詞",-1,"damage the roof","","",2),
+w("describe","描写する・説明する","動詞",0,"describe the symptoms","description(名)","",2),
+w("discover","発見する","動詞",1,"discover a new species","discovery(名)","",2),
+w("earn","稼ぐ・得る","動詞",1,"earn money","earnings(名/収入)","",2),
+w("encourage","励ます・促す","動詞",1,"encourage students","encouragement(名)","discourage",2),
+w("examine","調べる・診察する","動詞",0,"examine the dog carefully","examination(名/試験・検査)","",2),
+w("exchange","交換する","動詞",0,"exchange money","","",2),
+w("express","表現する","動詞",0,"express my feelings","expression(名/表現・表情)","",2),
+w("graduate","卒業する","動詞",1,"graduate from college","graduation(名)","",2),
+w("guess","推測する","動詞",0,"Guess what!","","",2),
+w("imagine","想像する","動詞",0,"imagine a better future","imagination(名)","",2),
+w("inform","知らせる","動詞",0,"inform us of the change","information(名)","",2),
+w("manage","管理する・なんとかやる","動詞",0,"manage a salon","management(名) / manager(名)","",2),
+w("measure","測る","動詞",0,"measure the weight","measurement(名)","",2),
+w("mention","述べる・触れる","動詞",0,"as I mentioned","","",2),
+w("operate","操作する・営業する・手術する","動詞",0,"operate the machine","operation(名)","",2),
+w("organize","整理する・準備する","動詞",0,"organize an event","organization(名/組織)","",2),
+w("own","所有している","動詞",0,"own two cats","owner(名/飼い主・所有者)","",2),
+w("perform","行う・演じる","動詞",0,"perform surgery","performance(名)","",2),
+w("prove","証明する","動詞",0,"prove it works","proof(名/証拠)","",2),
+w("raise","上げる・育てる","動詞",0,"raise prices / raise a puppy","","",2),
+w("recognize","見分けがつく・認める","動詞",0,"recognize his voice","recognition(名)","",2),
+w("remain","〜のままである・残る","動詞",0,"remain calm","","",2),
+w("remind","思い出させる","動詞",0,"remind me of the meeting","reminder(名/リマインド)","",2),
+w("remove","取り除く","動詞",0,"remove the stain","removal(名)","",2),
+w("rent","（有料で）借りる・貸す","動詞",0,"rent an apartment","rental(形/レンタルの)","",2),
+w("respond","返答する・反応する","動詞",0,"respond to the email","response(名)","",2),
+w("search","さがす","動詞",0,"search for information","","",2),
+w("expensive","高価な","形容詞",0,"an expensive watch","expense(名/費用)","cheap",2),
+w("correct","正しい","形容詞",1,"the correct answer","correctly(副) / correction(名)","incorrect",2),
+w("dangerous","危険な","形容詞",-1,"a dangerous road","danger(名)","safe",2),
+w("different","違う","形容詞",0,"a different color","difference(名)","similar(似ている)",2),
+w("difficult","難しい","形容詞",-1,"a difficult question","difficulty(名)","easy",2),
+w("famous","有名な","形容詞",1,"famous for its hot springs","","",2),
+w("important","重要な","形容詞",1,"an important meeting","importance(名)","",2),
+w("local","地元の","形容詞",0,"local people","","",2),
+w("necessary","必要な","形容詞",0,"if necessary","necessity(名)","unnecessary",2),
+w("popular","人気のある","形容詞",1,"popular among students","popularity(名)","unpopular",2),
+w("already","すでに","副詞",0,"I've already eaten.","","",2),
+w("almost","ほとんど","副詞",0,"almost every day","","",2),
+w("usually","たいてい","副詞",0,"I usually get up at six.","usual(形)","unusual(めずらしい)",2),
+w("finally","ついに","副詞",1,"finally finished","final(形)","",2),
+w("probably","たぶん","副詞",0,"It will probably rain.","probable(形)","",2),
+w("instead","代わりに","副詞",0,"use honey instead of sugar","","",2),
+w("transfer","乗り換える・移す","動詞",0,"transfer to the subway at Ueno","trans=移：transport / translate / transplant(移植する)","",2),
+// ===== 優先度★（3週目）=====
+w("accomplish","成し遂げる","動詞",1,"accomplish the mission","accomplishment(名)","",3),
+w("admit","認める","動詞",0,"admit the mistake","admission(名/入場・入学)","deny(否定する)",3),
+w("assume","〜と想定する","動詞",0,"assume it's true","assumption(名)","",3),
+w("belong","所属する","動詞",0,"belong to the tennis club","","",3),
+w("consist","〜から成る","動詞",0,"consist of five members","","",3),
+w("contribute","貢献する","動詞",1,"contribute to the team","contribution(名)","",3),
+w("cooperate","協力する","動詞",1,"cooperate with each other","cooperation(名)","",3),
+w("destroy","破壊する","動詞",-1,"destroy the forest","destruction(名)","",3),
+w("divide","分ける","動詞",0,"divide into three groups","division(名)","",3),
+w("estimate","見積もる","動詞",0,"estimate the cost","","",3),
+w("exist","存在する","動詞",0,"Does it really exist?","existence(名)","",3),
+w("hesitate","ためらう","動詞",-1,"Don't hesitate to ask.","","",3),
+w("impress","感動させる・印象づける","動詞",1,"be impressed by the show","impression(名) / impressive(形)","",3),
+w("injure","けがをさせる","動詞",-1,"be injured in the accident","injury(名/けが)","",3),
+w("invent","発明する","動詞",1,"invent a new tool","invention(名) / inventor(名)","",3),
+w("invest","投資する","動詞",0,"invest in stocks","investment(名)","",3),
+w("involve","巻き込む・含む","動詞",0,"be involved in the project","","",3),
+w("locate","位置する・見つける","動詞",0,"be located near the park","location(名)","",3),
+w("obtain","手に入れる","動詞",0,"obtain a license","","",3),
+w("persuade","説得する","動詞",0,"persuade him to join","","",3),
+w("postpone","延期する","動詞",-1,"postpone the event","= put off","",3),
+w("predict","予測する","動詞",0,"predict the weather","prediction(名)","",3),
+w("publish","出版する・公表する","動詞",0,"publish a book","publisher(名/出版社)","",3),
+w("rely","頼る","動詞",0,"rely on the data","reliable(形/信頼できる)","",3),
+w("suffer","苦しむ","動詞",-1,"suffer from a headache","","",3),
+w("survive","生き残る","動詞",1,"survive the winter","survival(名)","",3),
+w("advantage","利点","名詞",1,"the advantage of living nearby","","disadvantage",3),
+w("advertisement","広告","名詞",0,"put an advertisement online","advertise(動) / ad(略)","",3),
+w("atmosphere","雰囲気・大気","名詞",0,"a relaxed atmosphere","","",3),
+w("audience","観客・聴衆","名詞",0,"a large audience","","",3),
+w("author","著者","名詞",0,"the author of this novel","","",3),
+w("award","賞","名詞",1,"win an award","","",3),
+w("behavior","ふるまい・行動","名詞",0,"the dog's behavior","behave(動)","",3),
+w("career","経歴・職業","名詞",0,"change my career","","",3),
+w("cause","原因・引き起こす","名詞",0,"the cause of the problem","","",3),
+w("ceremony","式典","名詞",0,"a graduation ceremony","","",3),
+w("citizen","市民","名詞",0,"a citizen of Japan","","",3),
+w("community","地域社会・コミュニティ","名詞",0,"the local community","","",3),
+w("consumer","消費者","名詞",0,"consumer needs","consume(動/消費する)","",3),
+w("degree","程度・学位・（温度の）度","名詞",0,"30 degrees","","",3),
+w("department","部門・売り場","名詞",0,"the sales department","","",3),
+w("destination","目的地","名詞",0,"a popular tourist destination","","",3),
+w("detail","詳細","名詞",0,"for more details","detailed(形)","",3),
+w("distance","距離","名詞",0,"a long distance","distant(形/遠い)","",3),
+w("economy","経済","名詞",0,"the Japanese economy","economic(形) / economical(形/節約になる)","",3),
+w("emergency","緊急事態","名詞",-1,"in case of emergency","","",3),
+w("evidence","証拠","名詞",0,"There is no evidence.","","",3),
+w("expert","専門家","名詞",1,"an expert in animal care","","",3),
+w("fare","運賃","名詞",0,"a bus fare","","",3),
+w("flight","（飛行機の）便","名詞",0,"a direct flight","fly(動)","",3),
+w("government","政府","名詞",0,"the local government","govern(動)","",3),
+w("growth","成長","名詞",1,"economic growth","grow(動)","",3),
+w("guest","客（招待客・宿泊客）","名詞",0,"a hotel guest","","",3),
+w("habit","習慣・くせ","名詞",0,"a good habit","","",3),
+w("industry","産業・業界","名詞",0,"the pet industry","industrial(形)","",3),
+w("influence","影響","名詞",0,"have a great influence on children","","",3),
+w("instruction","指示・説明書","名詞",0,"follow the instructions","instruct(動) / instructor(名/講師)","",3),
+w("insurance","保険","名詞",0,"pet insurance","insure(動)","",3),
+w("luggage","手荷物","名詞",0,"carry heavy luggage","= baggage","",3),
+w("material","材料・資料","名詞",0,"teaching materials","","",3),
+w("method","方法","名詞",0,"an effective method","","",3),
+w("neighborhood","近所","名詞",0,"a quiet neighborhood","neighbor(名/隣人)","",3),
+w("passenger","乗客","名詞",0,"passengers on the train","","",3),
+w("population","人口","名詞",0,"the population of Tokyo","","",3),
+w("pressure","圧力・プレッシャー","名詞",-1,"under pressure","","",3),
+w("process","過程・手順","名詞",0,"the learning process","","",3),
+w("relationship","関係","名詞",0,"build a good relationship","relate(動) / relation(名)","",3),
+w("research","研究・調査","名詞",0,"do research on animals","researcher(名)","",3),
+w("resource","資源","名詞",0,"natural resources","","",3),
+w("responsibility","責任","名詞",0,"take responsibility","responsible(形)","",3),
+w("trend","傾向・流行","名詞",0,"the latest trend","","",3),
+w("vehicle","乗り物・車両","名詞",0,"electric vehicles","","",3),
+w("anxious","不安な","形容詞",-1,"anxious about the future","anxiety(名/不安)","",3),
+w("aware","気づいている","形容詞",0,"be aware of the risk","awareness(名)","unaware",3),
+w("capable","能力がある","形容詞",1,"capable of doing the job","capability(名)","",3),
+w("confident","自信がある","形容詞",1,"confident in my skills","confidence(名/自信)","",3),
+w("crowded","混雑した","形容詞",-1,"a crowded train","crowd(名/群衆)","",3),
+w("curious","好奇心が強い","形容詞",1,"curious about everything","curiosity(名)","",3),
+w("essential","不可欠な","形容詞",1,"essential for health","essentially(副)","",3),
+// ===== 熟語・チャンク =====
+w("take place","行われる・開催される","熟語",0,"The event will take place on Sunday.","= be held","",2),
+w("take care of","〜の世話をする","熟語",1,"take care of the dogs","= look after","",2),
+w("look after","〜の世話をする","熟語",1,"look after the cat","= take care of","",2),
+w("look for","〜をさがす","熟語",0,"look for my keys","= search for","",2),
+w("carry out","実行する","熟語",0,"carry out the plan","","",2),
+w("figure out","理解する・解決する","熟語",1,"figure out the answer","","",2),
+w("put off","延期する","熟語",-1,"put off the meeting","= postpone","",2),
+w("set up","設立する・準備する","熟語",1,"set up a new salon","","",2),
+w("deal with","対処する","熟語",0,"deal with complaints","","",2),
+w("pick up","拾う・迎えに行く","熟語",0,"pick you up at the station","","",2),
+w("turn off","（電気などを）消す","熟語",0,"turn off the lights","","turn on(つける)",2),
+w("fill out","（書類に）記入する","熟語",0,"fill out this form","= fill in","",2),
+w("hand in","提出する","熟語",0,"hand in the report","= submit","",2),
+w("sign up for","〜に申し込む・登録する","熟語",1,"sign up for the class","= register for","",2),
+w("be supposed to","〜することになっている","熟語",0,"You're supposed to be here at nine.","","",2),
+w("make sure","必ず〜する・確かめる","熟語",0,"Make sure the door is locked.","","",2),
+w("in addition","加えて・さらに","熟語",0,"In addition, breakfast is free.","= additionally","",2),
+w("instead of","〜の代わりに","熟語",0,"walk instead of driving","instead(副)","",2),
+w("thanks to","〜のおかげで","熟語",1,"Thanks to your help, we finished early.","","",2),
+w("in order to","〜するために","熟語",0,"in order to save money","","",2),
+w("as soon as","〜するとすぐに","熟語",0,"Call me as soon as you arrive.","","",2),
+w("as well as","〜だけでなく…も","熟語",0,"cats as well as dogs","","",2),
+w("right away","すぐに","熟語",0,"I'll do it right away.","= immediately","",2),
+w("for free","無料で","熟語",1,"get a drink for free","= for nothing","",2),
+w("in time","間に合って","熟語",1,"arrive in time for the show","on time(時間どおりに)との違いに注意","",2),
+w("come up with","（案を）思いつく","熟語",1,"come up with a good idea","","",3),
+w("get along with","〜と仲良くやる","熟語",1,"get along with coworkers","","",3),
+w("turn down","断る・（音量を）下げる","熟語",-1,"turn down the offer","= refuse","",3),
+w("run out of","〜を切らす・使い果たす","熟語",-1,"run out of shampoo","","",3),
+w("be about to","まさに〜するところ","熟語",0,"I was about to leave.","","",3),
+w("be likely to","〜しそうだ","熟語",0,"It's likely to rain.","likely(形)","unlikely",3),
+w("be used to","〜に慣れている","熟語",0,"be used to getting up early","toの後は名詞/〜ing","",3),
+w("used to","（昔は）〜したものだ","熟語",0,"I used to live in Osaka.","be used to(慣れている)と区別","",3),
+w("in charge of","〜の担当で","熟語",0,"in charge of sales","","",3),
+w("be responsible for","〜に責任がある","熟語",0,"be responsible for the project","responsibility(名)","",3),
+w("no longer","もはや〜ない","熟語",0,"He no longer works here.","= not ... anymore","",3),
+w("by mistake","間違えて","熟語",-1,"delete the file by mistake","","on purpose",3),
+w("on purpose","わざと","熟語",0,"He did it on purpose.","","by mistake",3),
+w("in fact","実は・実際は","熟語",0,"In fact, it's quite easy.","","",3),
+w("at first","最初は","熟語",0,"At first, I was nervous.","","",3),
+w("after all","結局・やっぱり","熟語",0,"It was true after all.","","",3),
+w("on the other hand","一方で","熟語",0,"On the other hand, it's expensive.","","",3),
+];
+
+/* 既存99語の優先度（★★★と★のリスト・それ以外は★★） */
+const PR1_OLD = new Set(["add","agree","possible","careful","useful","improve","increase","decrease","provide","receive","require","attend","available","schedule","delay","cancel","confirm","deliver","discount","customer","experience","skill","opportunity","decide","suggest","recommend","prepare","complete","develop","result","effective","convenient","comfortable","environment","avoid","prevent","solve","current","recent","several","various","immediately"]);
+const PR3_OLD = new Set(["contract","invoice","expense","profit","retire","resign","manufacture","facility","efficient","disappoint","appropriate","bilingual"]);
+const ALLSAMPLE = SAMPLE.concat(SAMPLE2)
+  .map(x => ({...x, pr: x.pr || (PR1_OLD.has(x.en) ? 1 : PR3_OLD.has(x.en) ? 3 : 2)}))
+  .sort((a,b) => a.pr - b.pr);
+
+/* ---------- 状態 ---------- */
+let S = null;
+function load(){
+  try{ S = JSON.parse(localStorage.getItem(KEY)); }catch(e){ S = null; }
+  if(!S || !Array.isArray(S.words)){
+    S = { v:3, words: ALLSAMPLE.map((x,i)=>({id:i+1, ...x})), nextId: ALLSAMPLE.length+1,
+          stats:{}, startDate:null, daily:{date:"", doneIds:[], ok:0, ng:0} };
+    save();
+    return;
+  }
+  if(!S.v || S.v < 3) migrate();
+}
+/* 旧データ（優先度なし）→ 新サンプル300語に引き継ぎ。学習記録・自作単語は保持する */
+function migrate(){
+  const byEn = {};
+  S.words.forEach(x => { byEn[x.en.toLowerCase()] = x; });
+  if(!S.nextId) S.nextId = Math.max(0, ...S.words.map(x=>x.id||0)) + 1;
+  const used = new Set(), words = [];
+  for(const smp of ALLSAMPLE){
+    const old = byEn[smp.en.toLowerCase()];
+    if(old && !used.has(old.id)){ words.push({...old, ...smp, id: old.id}); used.add(old.id); }
+    else words.push({id: S.nextId++, ...smp});
+  }
+  for(const x of S.words){ if(!used.has(x.id)) words.push({pr:2, ...x}); }
+  S.words = words.sort((a,b)=>(a.pr||2)-(b.pr||2));
+  S.v = 3;
+  save();
+}
+function prStars(p){ return p===1 ? "★★★" : p===3 ? "★" : "★★"; }
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+function st(id){ if(!S.stats[id]) S.stats[id]={seen:0,miss:0,forgot:false}; return S.stats[id]; }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function ensureDaily(){ const t=todayStr(); if(S.daily.date!==t){ S.daily={date:t,doneIds:[],ok:0,ng:0}; save(); } }
+
+/* ---------- 週サイクル ---------- */
+function weekNum(){
+  if(!S.startDate) return 1;
+  const days = Math.floor((new Date(todayStr()) - new Date(S.startDate)) / 86400000);
+  return Math.max(1, Math.floor(days/7)+1);
+}
+function weekLabel(){
+  const wk = weekNum();
+  if(wk<=3) return wk+"週目（優先度 "+prStars(wk)+"）";
+  if(wk===4) return "4週目（全体復習）";
+  return wk+"週目（維持期：忘れた単語中心）";
+}
+function weekBatch(){
+  const wk = weekNum();
+  if(wk>=4) return S.words.slice();
+  const g = S.words.filter(x=>(x.pr||2)===wk);
+  return g.length ? g : S.words.slice();
+}
+function forgotWords(){ return S.words.filter(x=>st(x.id).forgot); }
+
+/* ---------- タブ ---------- */
+function tab(btn){
+  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  showPanel(btn.dataset.p);
+}
+function showPanel(id){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("on"));
+  document.getElementById(id).classList.add("on");
+  if(id==="p-home") renderHome();
+  if(id==="p-words") renderWords();
+  if(id==="p-set") renderSet();
+}
+
+/* ---------- ホーム ---------- */
+function renderHome(){
+  ensureDaily();
+  const batch = weekBatch();
+  const done = S.daily.doneIds.length;
+  const fw = forgotWords().length;
+  const el = document.getElementById("home-status");
+  el.innerHTML = `
+    <span class="week-badge">${weekLabel()}</span>
+    <div>今日の単語 <span class="big-num">${batch.length}</span> 語</div>
+    <div class="stat-row">
+      <div class="stat"><div class="v">${done}</div><div class="l">今日チェック済み</div></div>
+      <div class="stat"><div class="v" style="color:var(--plus-ink)">${S.daily.ok}</div><div class="l">覚えてた ○</div></div>
+      <div class="stat"><div class="v" style="color:var(--minus-ink)">${S.daily.ng}</div><div class="l">忘れてた ×</div></div>
+    </div>
+    <p class="muted" style="margin-top:10px;">単語帳：全 ${S.words.length} 語（★★★ ${S.words.filter(x=>(x.pr||2)===1).length} ／ ★★ ${S.words.filter(x=>(x.pr||2)===2).length} ／ ★ ${S.words.filter(x=>(x.pr||2)===3).length}）<br>苦手（×）マーク中：${fw} 語</p>`;
+  document.getElementById("btn-review").disabled = fw===0;
+}
+
+/* ---------- 学習セッション ---------- */
+let Q = [], qi = 0, revealed = false, mode = "study";
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function startStudy(){
+  ensureDaily();
+  if(S.words.length===0){ toast("単語がありません。追加してください"); return; }
+  if(!S.startDate){ S.startDate = todayStr(); save(); }
+  const batch = weekBatch();
+  const fg = shuffle(batch.filter(x=>st(x.id).forgot));
+  const rest = shuffle(batch.filter(x=>!st(x.id).forgot));
+  Q = fg.concat(rest); qi = 0; revealed = false; mode = "study";
+  goStudyPanel();
+}
+function startReview(){
+  ensureDaily();
+  Q = shuffle(forgotWords()); qi = 0; revealed = false; mode = "review";
+  if(Q.length===0){ toast("×マークの単語はありません🎉"); return; }
+  goStudyPanel();
+}
+function goStudyPanel(){
+  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("on"));
+  showPanel("p-study");
+  renderCard();
+}
+function renderCard(){
+  const area = document.getElementById("study-area");
+  if(qi >= Q.length){
+    const label = mode==="review" ? "復習" : "今日のひと回り";
+    area.innerHTML = `
+      <div class="box done-msg">
+        <div class="emoji">🌸</div>
+        <p><b>${label}おつかれさまでした！</b><br>
+        ○ ${S.daily.ok} ／ × ${S.daily.ng}<br>
+        ×にした単語は明日も優先的に出てきます。</p>
+        <button class="btn" onclick="startStudy()">もう一回まわす</button>
+        <button class="btn ghost" onclick="backHome()">ホームへもどる</button>
+      </div>`;
+    return;
+  }
+  const x = Q[qi]; const s = st(x.id);
+  const img = x.img==1 ? ["p","＋ ポジティブ"] : x.img==-1 ? ["m","− ネガティブ"] : ["n","± ニュートラル"];
+  area.innerHTML = `
+    <div class="prog">${mode==="review"?"🔁 復習モード":"📖 学習モード"}　${qi+1} / ${Q.length}</div>
+    <div class="progbar"><div style="width:${(qi/Q.length)*100}%"></div></div>
+    <div class="fcard" onclick="reveal()">
+      ${s.forgot?'<span class="forgot-mark">前回 × の単語</span>':""}
+      <span class="imgtag ${img[0]}">${img[1]}</span>
+      <div class="word">${esc(x.en)}</div>
+      ${x.pos?`<div class="pos">${esc(x.pos)}</div>`:""}
+      <button class="speak-btn" onclick="event.stopPropagation();speak('${jsq(x.en)}')">🔊 音を聞く</button>
+      <div id="card-back">${revealed ? backHTML(x) : '<div class="hint">タップして意味を見る</div>'}</div>
+    </div>
+    <div class="judge" id="judge" style="visibility:${revealed?"visible":"hidden"}">
+      <button class="ng" onclick="mark(false)">× 忘れてた</button>
+      <button class="ok" onclick="mark(true)">○ 覚えてた</button>
+    </div>
+    <button class="btn small ghost" onclick="backHome()">中断してホームへ</button>`;
+  if(!revealed) speak(x.en);
+}
+function backHTML(x){
+  let d = `<div class="ja">${esc(x.ja)}</div>`;
+  const rows = [];
+  if(x.ex)  rows.push(`<b>📎 フレーズ:</b> ${esc(x.ex)}`);
+  if(x.fam) rows.push(`<b>🌱 ファミリー:</b> ${esc(x.fam)}`);
+  if(x.ant) rows.push(`<b>⇄ 反対:</b> ${esc(x.ant)}`);
+  if(rows.length) d += `<div class="detail">${rows.join("<br>")}</div>`;
+  return d;
+}
+function reveal(){
+  if(revealed) return;
+  revealed = true;
+  document.getElementById("card-back").innerHTML = backHTML(Q[qi]);
+  document.getElementById("judge").style.visibility = "visible";
+}
+function mark(ok){
+  const x = Q[qi]; const s = st(x.id);
+  s.seen++;
+  if(ok){ s.forgot = false; S.daily.ok++; }
+  else  { s.forgot = true; s.miss++; S.daily.ng++; }
+  if(!S.daily.doneIds.includes(x.id)) S.daily.doneIds.push(x.id);
+  save();
+  qi++; revealed = false;
+  renderCard();
+}
+function backHome(){
+  document.querySelectorAll(".tabbar button").forEach((b,i)=>b.classList.toggle("on", i===0));
+  showPanel("p-home");
+}
+
+/* ---------- 音声 ---------- */
+function speak(text){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US"; u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- 単語帳 ---------- */
+function renderWords(){
+  const q = (document.getElementById("search").value||"").trim().toLowerCase();
+  const list = document.getElementById("word-list");
+  const items = S.words.filter(x => !q || x.en.toLowerCase().includes(q) || x.ja.includes(q))
+    .sort((a,b)=>(a.pr||2)-(b.pr||2));
+  document.getElementById("word-count").textContent = `全 ${S.words.length} 語（表示中 ${items.length} 語）`;
+  list.innerHTML = items.map(x=>{
+    const s = st(x.id);
+    return `<div class="wrow" onclick="this.classList.toggle('open')">
+      <div class="top">
+        <span class="en">${esc(x.en)}</span>
+        <span class="pr">${prStars(x.pr||2)}</span>
+        ${s.forgot?'<span class="badge-ng">×'+s.miss+'</span>':""}
+        <span class="ja2">${esc(x.ja)}</span>
+      </div>
+      <div class="exp">
+        ${x.pos?`品詞: ${esc(x.pos)}<br>`:""}
+        ${x.ex?`📎 ${esc(x.ex)}<br>`:""}
+        ${x.fam?`🌱 ${esc(x.fam)}<br>`:""}
+        ${x.ant?`⇄ ${esc(x.ant)}<br>`:""}
+        優先度: ${prStars(x.pr||2)}（${Math.min(x.pr||2,3)}週目に学習）<br>
+        チェック回数: ${s.seen} ／ ×の回数: ${s.miss}
+        <br><button class="del" style="color:#b98a2f;border-color:#d9a53f" onclick="event.stopPropagation();cyclePr(${x.id})">優先度をかえる</button>
+        <button class="del" onclick="event.stopPropagation();delWord(${x.id})">この単語を削除</button>
+        <button class="del" style="color:var(--accent-dark);border-color:var(--accent)" onclick="event.stopPropagation();speak('${jsq(x.en)}')">🔊 発音</button>
+      </div>
+    </div>`;
+  }).join("") || `<p class="muted" style="text-align:center;padding:20px;">見つかりませんでした</p>`;
+}
+function cyclePr(id){
+  const x = S.words.find(w=>w.id===id);
+  if(!x) return;
+  x.pr = ((x.pr||2) % 3) + 1;
+  save(); renderWords();
+  toast(`「${x.en}」の優先度を ${prStars(x.pr)} にしました`);
+}
+function delWord(id){
+  const x = S.words.find(w=>w.id===id);
+  if(!x) return;
+  if(!confirm(`「${x.en}」を削除しますか？`)) return;
+  S.words = S.words.filter(w=>w.id!==id);
+  delete S.stats[id];
+  save(); renderWords(); toast("削除しました");
+}
+
+/* ---------- 追加 ---------- */
+function addWord(){
+  const en = document.getElementById("a-en").value.trim();
+  const ja = document.getElementById("a-ja").value.trim();
+  if(!en || !ja){ toast("英単語と意味は必須です"); return; }
+  S.words.push({ id:S.nextId++, en, ja,
+    pos: document.getElementById("a-pos").value,
+    img: Number(document.getElementById("a-img").value),
+    pr: Number(document.getElementById("a-pr").value),
+    ex: document.getElementById("a-ex").value.trim(),
+    fam: document.getElementById("a-fam").value.trim(),
+    ant: document.getElementById("a-ant").value.trim() });
+  save();
+  ["a-en","a-ja","a-ex","a-fam","a-ant"].forEach(i=>document.getElementById(i).value="");
+  toast(`「${en}」を追加しました`);
+}
+function bulkAdd(){
+  const lines = document.getElementById("bulk").value.split("\n").map(l=>l.trim()).filter(Boolean);
+  let n = 0;
+  for(const line of lines){
+    const parts = line.split(/\t|,|、/).map(p=>p.trim()).filter(Boolean);
+    if(parts.length < 2) continue;
+    S.words.push({ id:S.nextId++, en:parts[0], ja:parts[1], pos:parts[2]||"", img:0, ex:parts[3]||"", fam:"", ant:"" });
+    n++;
+  }
+  save();
+  document.getElementById("bulk").value = "";
+  toast(n>0 ? `${n} 語を追加しました` : "追加できる行がありませんでした（「英単語, 意味」の形で書いてください）");
+}
+
+/* ---------- 設定 ---------- */
+function renderSet(){
+  const info = document.getElementById("cycle-info");
+  info.innerHTML = S.startDate
+    ? `学習開始日: ${S.startDate}<br>現在: ${weekLabel()}<br>1週目は★★★、2週目は★★、3週目は★の単語を毎日くり返し、4週目からは全体復習に切り替わります。`
+    : "まだ学習を始めていません。「今日の学習をはじめる」を押した日が1週目のスタートになります。";
+}
+function resetCycle(){
+  if(!confirm("学習サイクルを今日から1週目としてやり直しますか？（単語と×マークはそのまま残ります）")) return;
+  S.startDate = todayStr(); save(); renderSet(); toast("1週目からスタートします");
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify(S, null, 1)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "tango-data-" + todayStr() + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("書き出しました");
+}
+function importData(input){
+  const f = input.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const d = JSON.parse(r.result);
+      if(!d || !Array.isArray(d.words)) throw 0;
+      if(!confirm(`${d.words.length} 語のデータを読み込みます。今のデータは上書きされます。よろしいですか？`)) return;
+      S = d; if(!S.stats) S.stats={}; if(!S.daily) S.daily={date:"",doneIds:[],ok:0,ng:0};
+      if(!S.nextId) S.nextId = Math.max(0,...S.words.map(x=>x.id||0))+1;
+      save(); renderHome(); toast("読み込みました");
+    }catch(e){ toast("読み込めませんでした（ファイルを確認してください）"); }
+    input.value = "";
+  };
+  r.readAsText(f);
+}
+function resetAll(){
+  if(!confirm("単語・学習記録をすべて消して、最初のサンプル単語に戻します。本当によろしいですか？")) return;
+  if(!confirm("この操作は元に戻せません。実行しますか？")) return;
+  localStorage.removeItem(KEY);
+  load(); renderHome(); backHome(); toast("リセットしました");
+}
+
+/* ---------- util ---------- */
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+function jsq(s){ return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
+let toastTimer = null;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+load();
+renderHome();
+</script>
+</body>
+</html>
