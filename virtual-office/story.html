@@ -341,11 +341,21 @@ const STORY = {
   ],
 };
 
-// 後でAI生成画像に差し替えたいときは、ここにファイルパスを書くだけ。
-// 例： "制作スタジオ": "images/studio.png",  "hero": "images/hero.png"
+// ================================================================
+//  ★ 画像差し替え（後でAI生成画像にできる。書き方は 画像差し替えガイド.md 参照）
+//  画像ファイルを images/ に置いて、ここに1行足すだけ。消せばドット絵に戻る。
+// ================================================================
+// 部屋の情景（部署カードの背景）＋ヒーローの建物
+// 例： "hero": "images/hero.png",  "秘書室": "images/scene/秘書室.png",
 const SCENE_IMAGES = {
-  // "hero": "images/hero.png",
-  // "秘書室": "images/hisho.png",
+};
+// キャラクター（ドット絵の犬の代わりに表示。透過PNG推奨）
+// 例： "morning": "images/char/morning.png",
+const CHAR_IMAGES = {
+};
+// おしごと劇場の背景（部署名がキー）
+// 例： "秘書室": "images/theater/秘書室.png",
+const THEATER_IMAGES = {
 };
 
 // フロア構成（部署・階・メンバー・ひとこと役割）
@@ -492,6 +502,16 @@ function faceDogSVG(id, P) {
   const d = dogRects(id, P, 0);
   return `<svg width="${12*P}" height="${d.rows*P}" xmlns="http://www.w3.org/2000/svg">${d.body}</svg>`;
 }
+
+// 画像があれば画像、なければドット絵（CHAR_IMAGES に1行足すだけで差し替わる）
+function charFace(id, P) {
+  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="${id}" style="width:${12*P}px;height:${12*P}px;object-fit:contain">`;
+  return faceDogSVG(id, P);
+}
+function charDesk(id, P) {
+  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="${id}" style="width:${14*P}px;height:${13*P}px;object-fit:contain">`;
+  return deskDogSVG(id, P);
+}
 function sunflowerSVG(P) {
   P = P || 5;
   const map = ["..Y.YY.Y..","..YOOOOY..",".YOBBBBOY.",".YOBBBBOY.","..YOOOOY..","..Y.YY.Y..","....GG....","..G.GG....","....GG.G..","....GG...."];
@@ -522,7 +542,7 @@ if (SCENE_IMAGES["hero"]) {
   const floorsHTML = FLOORS.map(fl => `
     <div class="brow">${fl.rooms.map(nm => {
       const r = roomByName[nm];
-      const dogs = r.members.slice(0, 2).map(m => deskDogSVG(m.id, 5)).join("");
+      const dogs = r.members.slice(0, 2).map(m => charDesk(m.id, 5)).join("");
       return `<div class="broom" style="background:linear-gradient(180deg, ${r.color}33, #5c422899), #6b4f33">
         <span class="rname" style="color:#fdf3d8">${nm}</span>
         <span class="lampglow"></span>${dogs}</div>`;
@@ -598,7 +618,7 @@ FLOORS.forEach(fl => {
     if (SCENE_IMAGES[nm]) {
       sceneInner = `<img class="sceneimg" src="${SCENE_IMAGES[nm]}" alt="${nm}">`;
     } else {
-      const dogs = r.members.slice(0, 3).map(m => deskDogSVG(m.id, 7)).join("");
+      const dogs = r.members.slice(0, 3).map(m => charDesk(m.id, 7)).join("");
       sceneInner = `
         <div class="win"></div>
         <div class="sunbeam"></div>
@@ -611,7 +631,7 @@ FLOORS.forEach(fl => {
     const memberCards = r.members.slice(0, 3).map(m => {
       const br = BREEDS[m.id] || {};
       return `<div class="member${m.advocate ? " advocate" : ""}">
-        ${faceDogSVG(m.id, 4)}
+        ${charFace(m.id, 4)}
         <div><div class="mn">${m.label}${m.advocate ? "〈検証官〉" : ""}</div>
         <div class="mb">${br.b || ""}</div>
         <div class="mr">${m.role}</div></div>
@@ -718,7 +738,7 @@ worry.innerHTML = `<div class="inner">
   <h2 class="sechead fadein">あなたの困りごとを、<br>犬たちに渡してください。</h2>
   <div class="secnote fadein">この先は、約90秒の小さな物語。<br>選んだ困りごとによって、動く部署と犬が変わります。</div>
   <div class="reception fadein">
-    ${faceDogSVG("claude", 6)}
+    ${charFace("claude", 6)}
     <div class="bubble">「ようこそ、陽だまりの丘へ。<br>今日は、何にお困りですか？」</div>
   </div>
   <div class="worrycards">${WORRIES.map((w, i) =>
@@ -739,19 +759,21 @@ function theaterHTML() {
   const phase = idx < 5 ? (idx === 0 ? "COLD OPEN" : "THE RELAY ・ 0" + idx)
               : idx === 5 ? "FINAL DECISION" : "COMPLETE";
   const prog = Array.from({ length: 7 }, (_, i) => `<span class="${i <= idx ? "on" : ""}"></span>`).join("");
-  const bg = `background: linear-gradient(180deg, ${room.color}55 0%, #4a3322 55%, #2e2014 100%)`;
+  const bg = THEATER_IMAGES[w.dept]
+    ? `background: linear-gradient(rgba(30,20,12,.5), rgba(30,20,12,.72)), url('${THEATER_IMAGES[w.dept]}') center/cover`
+    : `background: linear-gradient(180deg, ${room.color}55 0%, #4a3322 55%, #2e2014 100%)`;
   let mid = "";
   if (idx < 5) {
     const b = w.beats[idx];
-    const dogs = room.members.slice(0, 4).map(m => deskDogSVG(m.id, 6)).join("");
+    const dogs = room.members.slice(0, 4).map(m => charDesk(m.id, 6)).join("");
     mid = `<div class="th-dogs">${dogs}</div>
       <div class="th-card">
-        <div class="th-sp">${faceDogSVG(b.id, 3)}<span class="th-name">${b.n}</span><span class="th-tag">${b.tag}</span>${b.badge ? `<span class="th-badge">${b.badge}</span>` : ""}</div>
+        <div class="th-sp">${charFace(b.id, 3)}<span class="th-name">${b.n}</span><span class="th-tag">${b.tag}</span>${b.badge ? `<span class="th-badge">${b.badge}</span>` : ""}</div>
         <div class="th-line">「${b.line}」</div>
         <div class="th-foot"><span class="th-step">${idx + 1} / 5　${BEAT_LABELS[idx]}</span><button class="th-next" id="thNext">見届ける</button></div>
       </div>`;
   } else if (idx === 5) {
-    mid = `<div class="th-dogs">${faceDogSVG("claude", 6)}</div>
+    mid = `<div class="th-dogs">${charFace("claude", 6)}</div>
       <div class="th-card" style="text-align:center">
         <div class="th-sp" style="justify-content:center"><span class="th-badge" style="margin:0 auto">FINAL DESK ・ HUMAN ONLY</span></div>
         <div class="th-line">「さいごの一手は、あなたのもの。」</div>

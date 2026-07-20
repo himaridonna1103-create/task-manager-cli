@@ -132,6 +132,8 @@
   }
   .desk:hover { background: rgba(255,255,255,.05); }
   .desk .sprite { height: 92px; display: flex; align-items: flex-end; justify-content: center; }
+  .desk .dogimg { max-height: 92px; max-width: 100px; object-fit: contain; }
+  .desk.active .dogimg { animation: bob 0.8s steps(2) infinite; }
   .desk .name { font-size: 10px; margin-top: 4px; line-height: 1.25; word-break: break-all; }
   .desk .breed { font-size: 9px; color: var(--gold); margin-top: 1px; opacity: .85; }
   .desk.active {
@@ -293,6 +295,12 @@
 </div>
 
 <script>
+// ============ 画像差し替え（後でAI生成画像にできる） ============
+// 画像を images/char/ に置いて、ここに1行足すだけ。消せばドット絵に戻る。
+// 例： "morning": "images/char/morning.png",
+const CHAR_IMAGES = {
+};
+
 // ============ 犬種ドット絵の型 ============
 // C=毛色メイン D=差し色(耳・マスク・斑) M=マズル/胸 F=ふわ毛 E=目 N=鼻
 const ARCHETYPES = {
@@ -680,7 +688,7 @@ function makeDesk(m) {
     <span class="idlebubble"></span>
     <span class="speech"></span>
     <span class="statcard" id="stat-${m.id}"></span>
-    <div class="sprite">${spriteSVG(m.id)}</div>
+    <div class="sprite">${CHAR_IMAGES[m.id] ? `<img class="dogimg" src="${CHAR_IMAGES[m.id]}" alt="${m.label}">` : spriteSVG(m.id)}</div>
     <div class="name">${m.label}</div>
     <div class="breed">${br ? br.b : ""}</div>`;
   d.addEventListener("click", () => react(m.id, d));

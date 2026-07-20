@@ -32,3 +32,7 @@ OFFICE_LOG.push({t:"2026-07-20T16:34:07+09:00",name:"claude",ev:"stop"});
 OFFICE_LOG.push({t:"2026-07-20T16:37:57+09:00",name:"claude",ev:"start"});
 OFFICE_LOG.push({t:"2026-07-20T16:40:41+09:00",name:"claude",ev:"stop"});
 OFFICE_LOG.push({t:"2026-07-20T16:41:43+09:00",name:"claude",ev:"start"});
+OFFICE_LOG.push({t:"2026-07-20T16:43:09+09:00",name:"claude",ev:"stop"});
+OFFICE_LOG.push({t:"2026-07-20T16:48:53+09:00",name:"claude",ev:"start"});
+OFFICE_LOG.push({t:"2026-07-20T16:50:43+09:00",name:"claude",ev:"stop"});
+OFFICE_LOG.push({t:"2026-07-20T16:53:39+09:00",name:"claude",ev:"start"});
