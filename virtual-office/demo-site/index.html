@@ -135,7 +135,7 @@
   .inner { max-width: 940px; margin: 0 auto; }
   .seckicker { text-align: center; font-size: 11px; letter-spacing: 5px; color: var(--gold); margin-bottom: 14px; }
   .sechead { text-align: center; font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: 4px; margin-bottom: 14px; }
-  .secnote { text-align: center; font-size: 12px; letter-spacing: 2px; opacity: .75; margin-bottom: 50px; line-height: 2; }
+  .secnote { text-align: center; font-size: 13px; letter-spacing: 2px; opacity: .8; margin-bottom: 50px; line-height: 2; }
 
   /* --- フロア一覧 --- */
   .dirgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 50px; max-width: 760px; margin: 0 auto; }
@@ -189,7 +189,7 @@
   .member svg { flex: 0 0 auto; }
   .member .mn { font-size: 14px; font-weight: 700; letter-spacing: 1px; }
   .member .mb { font-size: 10px; color: var(--gold); margin-top: 2px; font-family: 'DotGothic16', monospace; }
-  .member .mr { font-size: 11px; opacity: .8; margin-top: 3px; line-height: 1.6; }
+  .member .mr { font-size: 12px; opacity: .85; margin-top: 3px; line-height: 1.6; }
   .member.advocate .mn { color: var(--terra); }
 
   /* ============ 受付窓口（困りごとセクション） ============ */
@@ -297,6 +297,14 @@
 
   .fadein { opacity: 0; transform: translateY(26px); transition: opacity .9s ease, transform .9s ease; }
   .fadein.visible { opacity: 1; transform: translateY(0); }
+
+  /* --- アクセシビリティ --- */
+  .dirrow:focus-visible, .worrycard:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .membermore { text-align: center; font-size: 11px; color: var(--gold); padding: 8px 0 12px; border-top: 1px solid rgba(74,58,42,.12); }
+  .nightsec .fin3 { margin-top: 18px; font-size: 10px; letter-spacing: 1px; opacity: .7; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -316,32 +324,31 @@
 
 <script>
 // ================================================================
-//  ★ 物語の設定（ここを書き換えれば、別の業種・別の会社にも使えます）
+//  設定
 // ================================================================
 const STORY = {
   brand: "HIMARI COMPANY",
-  brandSub: "ON THE SUNNY HILL · 31 AI EMPLOYEES",
-  heroLead: "午前9時。丘の上のオフィスは、今日もしっぽ日和。",
+  brandSub: "ON THE SUNNY HILL ・ 32 DOGS AT WORK",
+  heroLead: "あさ6時すぎ。丘の上のオフィスは、今日もしっぽ日和。",
   heroTitle: ["陽だまりの丘の、", "ちいさなオフィス"],
-  heroSub: "丘の上の一軒家で、31匹の犬のAI社員が今日も働いています。",
-  captionChip: "31のしっぽは、31の仕事",
+  heroSub: "丘の上の一軒家で、32匹の犬のAI社員が今日も働いています。",
+  captionChip: "しっぽの数だけ、片づく雑務。",
   dirKicker: "FLOOR GUIDE",
   dirHead: "フロアのご案内",
-  dirNote: "多くの部署には「検証官」——作ったものを疑う専門職——が控えています。",
+  dirNote: "ほとんどの部署に「品質係」の犬がいます。できあがった仕事を、まず疑ってみるのが役目です。",
   deptKicker: "DEPARTMENTS",
   closing: {
     kicker: "HIMARI COMPANY ／ HUMAN IN THE LOOP",
-    title: ["犬たちは、あなたの代わりに", "働くためにいるのではありません。"],
-    body: "考えなくていい仕事を引き受けて、あなたにしかできない判断と、誰かに向き合う時間を返すためにいます。丘の上でしっぽを振りつづけるのは、AIを主役にするためではなく、あなたの明日を少し軽くするためです。",
+    title: ["犬たちの仕事は、あなたから", "仕事を奪うことではありません。"],
+    body: "めんどうな仕事は犬たちが引き受けます。あなたの手もとに残るのは、あなたにしかできない判断と、大切な相手と向き合う時間。丘の犬たちがしっぽを振りつづけるのは、AIの自慢のためではなく、あなたの毎日にすこしのゆとりをつくるためです。",
     fin: "陽だまりの丘の、ちいさなオフィス",
-    fin2: "HIMARI COMPANY · 31 AI EMPLOYEES · ONE HUMAN DECISION",
+    fin2: "HIMARI COMPANY ・ 32 DOGS AT WORK ・ YOU MAKE THE CALL",
   },
   links: [],
 };
 
 // ================================================================
-//  ★ 画像差し替え（後でAI生成画像にできる。書き方は 画像差し替えガイド.md 参照）
-//  画像ファイルを images/ に置いて、ここに1行足すだけ。消せばドット絵に戻る。
+//  画像設定
 // ================================================================
 // 部屋の情景（部署カードの背景）＋ヒーローの建物
 // 例： "hero": "images/hero.png",  "秘書室": "images/scene/秘書室.png",
@@ -365,58 +372,58 @@ const FLOORS = [
 ];
 
 const ROOMS = [
-  { name: "受付", color: "#e8c15a", tagline: "依頼を聞き、最適な担当へ仕事をつなぐ。最後は人へ戻す。", members: [
-    { id: "claude", label: "Claude", role: "所長。御用聞きと振り分け" },
+  { name: "受付", color: "#e8c15a", tagline: "困りごとに耳を貸して、ぴったりの担当へ。しめくくりはあなたの手に。", members: [
+    { id: "claude", label: "Claude（所長）", role: "所長。相談ととりつぎ" },
   ]},
   { name: "秘書室", color: "#7ec98f", tagline: "予定・メール・朝の段取り。日々の流れを整える。", members: [
-    { id: "secretary", label: "secretary", role: "予定とメールの御用聞き" },
-    { id: "morning", label: "morning", role: "朝の段取りを整える" },
-    { id: "spreadsheet-operator", label: "spreadsheet-operator", role: "表計算の職人" },
-    { id: "meeting-supporter", label: "meeting-supporter", role: "会議を議事録に変える" },
-    { id: "meeting-summarizer", label: "meeting-summarizer", role: "長い話を要点にする" },
-    { id: "goal-tracker", label: "goal-tracker", role: "目標と振り返りの番人" },
+    { id: "secretary", label: "秘書係", role: "予定とメールをととのえる" },
+    { id: "morning", label: "朝の段取り係", role: "一日のはじまりを組み立てる" },
+    { id: "spreadsheet-operator", label: "表計算係", role: "表とデータの職人" },
+    { id: "meeting-supporter", label: "議事録係", role: "会議を議事録に変える" },
+    { id: "meeting-summarizer", label: "要約係", role: "長い話を要点にする" },
+    { id: "goal-tracker", label: "目標係", role: "目標と振り返りの番人" },
   ]},
   { name: "制作スタジオ", color: "#e089b8", tagline: "記事・スライド・レポート。伝わるかたちに仕立てる。", members: [
-    { id: "writing-crew-starter", label: "writing-crew", role: "記事づくりの一番隊" },
-    { id: "slide-maker", label: "slide-maker", role: "スライドの座組屋" },
-    { id: "report-writer", label: "report-writer", role: "報告書の仕立て屋" },
-    { id: "content-creator", label: "content-creator", role: "発信ネタの企画屋" },
-    { id: "design-consultant", label: "design-consultant", role: "見た目の相談役" },
-    { id: "image-prompt-generator", label: "image-prompt-gen", role: "画像の呪文書き" },
-    { id: "text-quality-checker", label: "text-quality-checker", role: "誤字を見逃さない検証官", advocate: true },
+    { id: "writing-crew-starter", label: "記事班", role: "記事づくりの一番隊" },
+    { id: "slide-maker", label: "スライド班", role: "スライドの座組屋" },
+    { id: "report-writer", label: "レポート班", role: "報告書の仕立て屋" },
+    { id: "content-creator", label: "発信企画係", role: "発信ネタの企画屋" },
+    { id: "design-consultant", label: "デザイン相談役", role: "見た目の相談役" },
+    { id: "image-prompt-generator", label: "画像の呪文書き", role: "画像生成の下ごしらえ" },
+    { id: "text-quality-checker", label: "疑り屋のダル", role: "誤字と事実をまず疑う", advocate: true },
   ]},
   { name: "経営企画部", color: "#5a8fd0", tagline: "市場を読み、勝ち筋を描き、案件へつなげる。", members: [
-    { id: "bizdev-strategist", label: "bizdev", role: "新規事業の参謀" },
-    { id: "marketing-strategist", label: "marketing-strategist", role: "集客の軍師" },
-    { id: "anken-coach-elite", label: "anken-coach-ELITE", role: "案件獲得の伴走者" },
-    { id: "anken-sales-product-designer", label: "anken-sales-designer", role: "営業トークの設計士" },
+    { id: "bizdev-strategist", label: "新規事業班", role: "新規事業の参謀" },
+    { id: "marketing-strategist", label: "マーケの軍師", role: "集客の作戦づくり" },
+    { id: "anken-coach-elite", label: "案件コーチ", role: "案件獲得の伴走者" },
+    { id: "anken-sales-product-designer", label: "営業設計士", role: "営業トークの設計士" },
   ]},
   { name: "専門職オフィス", color: "#9a6fd0", tagline: "経理・法務・採用・学び。専門の目で守りを固める。", members: [
-    { id: "accounting-helper", label: "accounting-helper", role: "仕訳と請求の帳簿係" },
-    { id: "legal-advisor", label: "legal-advisor", role: "契約書の見張り番" },
-    { id: "hiring-assistant", label: "hiring-assistant", role: "採用の公平係" },
-    { id: "learning-advisor", label: "learning-advisor", role: "学びの案内人" },
-    { id: "customer-support-advisor", label: "CS-advisor", role: "お客様対応の改善係" },
+    { id: "accounting-helper", label: "帳簿係", role: "仕訳と請求のととのえ役" },
+    { id: "legal-advisor", label: "契約見張り番", role: "契約書の気になる点を拾う" },
+    { id: "hiring-assistant", label: "採用係", role: "採用の公平係" },
+    { id: "learning-advisor", label: "学びの案内人", role: "学習計画の相談役" },
+    { id: "customer-support-advisor", label: "お客さま係", role: "お客様対応の改善係" },
   ]},
   { name: "リサーチラボ", color: "#3fb8a8", tagline: "調べて、裏を取って、出典つきで届ける。", members: [
-    { id: "research-assistant", label: "research-assistant", role: "調べ物の探検家" },
-    { id: "academic-scout", label: "academic-scout", role: "論文の斥候" },
+    { id: "research-assistant", label: "調査探検家", role: "調べ物の探検家" },
+    { id: "academic-scout", label: "論文の斥候", role: "最新研究の見はり役" },
   ]},
   { name: "技術部", color: "#e0913f", tagline: "作る・守る・鍛える。オフィスの土台を支える。", members: [
-    { id: "engineer-assistant", label: "engineer-assistant", role: "設計とコードの相談役" },
-    { id: "security-guard", label: "security-guard", role: "鍵と扉の守衛", advocate: true },
-    { id: "agent-team-builder", label: "agent-team-builder", role: "チームの座組師" },
-    { id: "create-vault", label: "create-vault", role: "資料庫の大工" },
-    { id: "make-claudemd", label: "make-claudemd", role: "ルールブックの編集者" },
-    { id: "elite-agent-upgrade-wizard", label: "upgrade-wizard", role: "更新の魔法使い" },
+    { id: "engineer-assistant", label: "技術相談役", role: "設計とコードの相談役" },
+    { id: "security-guard", label: "守衛のロット", role: "鍵と扉の守衛", advocate: true },
+    { id: "agent-team-builder", label: "チーム座組師", role: "チームの役割を設計する" },
+    { id: "create-vault", label: "資料庫大工", role: "資料の置き場所をつくる" },
+    { id: "make-claudemd", label: "ルール編集係", role: "ルールブックの編集者" },
+    { id: "elite-agent-upgrade-wizard", label: "更新の魔法使い", role: "みんなを新しく保つ" },
   ]},
   { name: "グルーミングサロン", color: "#e07a90", tagline: "ふわふわの仕上がりと、現場の気持ちがわかる看板娘。", members: [
-    { id: "grooming-assistant", label: "grooming-assistant", role: "サロンの看板娘「ひまりちゃん」" },
+    { id: "grooming-assistant", label: "看板娘ひまりちゃん", role: "サロン業務のなんでも屋" },
   ]},
 ];
 
 // ================================================================
-//  犬種ドット絵（office.html と同じ設定）
+//  犬種ドット絵
 // ================================================================
 const ARCHETYPES = {
   pointy: ["DD........DD","DCD......DCD",".CCCCCCCCCC.",".CCCCCCCCCC.",".CCECCCCECC.",".CCCCMMCCCC.",".CCMMMMMMCC.","..CMMNNMMC..","...MMMMMM...","..CCCCCCCC..",".CCCCCCCCCC."],
@@ -503,11 +510,11 @@ function faceDogSVG(id, P) {
 
 // 画像があれば画像、なければドット絵（CHAR_IMAGES に1行足すだけで差し替わる）
 function charFace(id, P) {
-  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="${id}" style="width:${12*P}px;height:${12*P}px;object-fit:contain">`;
+  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="" style="width:${12*P}px;height:${12*P}px;object-fit:contain">`;
   return faceDogSVG(id, P);
 }
 function charDesk(id, P) {
-  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="${id}" style="width:${14*P}px;height:${13*P}px;object-fit:contain">`;
+  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="" style="width:${14*P}px;height:${13*P}px;object-fit:contain">`;
   return deskDogSVG(id, P);
 }
 function sunflowerSVG(P) {
@@ -595,7 +602,7 @@ const dir = document.createElement("section");
 dir.className = "papersec";
 const dirRows = FLOORS.flatMap(fl => fl.rooms.map(nm => {
   const r = roomByName[nm];
-  return `<div class="dirrow fadein" data-room="${nm}"><span class="df">${fl.f}</span><span class="dn">${nm}</span><span class="dc">${r.members.length}名</span></div>`;
+  return `<div class="dirrow fadein" data-room="${nm}" tabindex="0" role="button"><span class="df">${fl.f}</span><span class="dn">${nm}</span><span class="dc">${r.members.length}匹</span></div>`;
 })).join("");
 dir.innerHTML = `<div class="inner">
   <div class="seckicker">${STORY.dirKicker}</div>
@@ -630,7 +637,7 @@ FLOORS.forEach(fl => {
       const br = BREEDS[m.id] || {};
       return `<div class="member${m.advocate ? " advocate" : ""}">
         ${charFace(m.id, 4)}
-        <div><div class="mn">${m.label}${m.advocate ? "〈検証官〉" : ""}</div>
+        <div><div class="mn">${m.label}${m.advocate ? "〈品質係〉" : ""}</div>
         <div class="mb">${br.b || ""}</div>
         <div class="mr">${m.role}</div></div>
       </div>`;
@@ -639,12 +646,13 @@ FLOORS.forEach(fl => {
       <div class="scene" style="${bgStyle}">
         ${sceneInner}
         <div class="scenecap">
-          <div class="sf">${fl.f} · ${r.members.length} AI EMPLOYEES</div>
+          <div class="sf">${fl.f} ・ はたらく犬 ${r.members.length}匹</div>
           <div class="sn">${nm}</div>
           <div class="st">${r.tagline}</div>
         </div>
       </div>
       <div class="members">${memberCards}</div>
+      ${r.members.length > 3 ? `<div class="membermore">…ほか ${r.members.length - 3} 匹のなかまがいます</div>` : ""}
     </div>`;
   });
 });
@@ -652,79 +660,79 @@ deptsec.innerHTML = `<div class="inner">${deptsHTML}</div>`;
 page.appendChild(deptsec);
 
 // --- 受付窓口（困りごとを選ぶと、動く部署と犬が変わる） ---
-const KENSHO = { id: "text-quality-checker", n: "自己満検問", tag: "本人の役に立つか、まず疑う", badge: "検証官 ・ まず疑う" };
-const CLAUDE_SP = { id: "claude", n: "Claude所長", tag: "御用聞き・振り分け" };
+const KENSHO = { id: "text-quality-checker", n: "疑り屋のダル", tag: "本人の役に立つか、まず疑う", badge: "品質係 ・ 疑うのが仕事" };
+const CLAUDE_SP = { id: "claude", n: "Claude所長", tag: "相談ととりつぎ" };
 const WORRIES = [
   { t: "AI、どこから始める？", s: "仕事を棚卸しして、最初の一歩を決める", dept: "技術部",
     beats: [
       { ...CLAUDE_SP, line: "技術部へ。この人の仕事を棚卸しして、最初の一歩に線を引いてください。" },
-      { id: "agent-team-builder", n: "agent-team-builder", tag: "チームの座組師", line: "仕事を全部書き出しました。AIに任せられるもの、人がやるべきもの、線を引いています。" },
+      { id: "agent-team-builder", n: "チーム座組師", tag: "チームの座組師", line: "仕事を全部書き出しました。AIに任せられるもの、人がやるべきもの、線を引いています。" },
       { ...KENSHO, line: "待った。ぜんぶ自動化しようとしてない？　最初の1個はどれ？" },
-      { id: "create-vault", n: "create-vault", tag: "資料庫の大工", line: "『今夜使える1個』だけに絞って、置き場所と手順を用意しました。" },
-      { ...KENSHO, line: "小さく始められるなら通します。承認デスクへ。" },
+      { id: "create-vault", n: "資料庫大工", tag: "資料庫の大工", line: "『今夜使える1個』だけに絞って、置き場所と手順を用意しました。" },
+      { ...KENSHO, line: "小さく始められるなら合格です。オーナーの机へ。" },
     ],
     complete: { title: "小さく始めるための最初の1個", line: "『いつかAI』が『今夜のひとつ』に変わりました。", sub: "棚卸し表と、明日からの手順つき。" } },
   { t: "毎日、雑務に追われて終わる", s: "予定・返信・議事録を整える", dept: "秘書室",
     beats: [
       { ...CLAUDE_SP, line: "秘書室へ。『急ぎ』と『大事』をわけて、この人の机を軽くしてあげて。" },
-      { id: "secretary", n: "secretary", tag: "メール下書き・予定整理", line: "返信が要るメールは3通だけでした。下書きを置いて、予定はひとつの流れに並べました。" },
-      { ...KENSHO, line: "待った。それ、本当にラクになってる？　減らさずに、並べ替えただけじゃない？" },
-      { id: "morning", n: "morning", tag: "朝の段取り係", line: "明日の最初の1件だけ残して、あとはこちらで巻き取る形に直しました。" },
-      { ...KENSHO, line: "うん、今度は通します。承認デスクへ。" },
+      { id: "secretary", n: "秘書係", tag: "メール下書き・予定整理", line: "返信が要るメールは3通だけでした。下書きを置いて、予定はひとつの流れに並べました。" },
+      { ...KENSHO, line: "まった！　メールが並べ替わっただけで、やること自体は減ってなくない？" },
+      { id: "morning", n: "朝の段取り係", tag: "朝の段取り係", line: "明日のいちばん大事な1件以外は、下書きまでこちらで仕上げる形にしました。" },
+      { ...KENSHO, line: "うん、これなら軽くなる。オーナーの机へどうぞ。" },
     ],
-    complete: { title: "明日が軽くなる段取り一式", line: "あなたの一日に、考える余白が戻りました。", sub: "返信下書き3通・段取り表・議事録つき。" } },
+    complete: { title: "あしたの段取り、まるごと一式", line: "明日の朝いちばんは、いちばん大事なことから。", sub: "返信下書き3通・段取り表・議事録つき。" } },
   { t: "発信したい。でも続かない", s: "あなたの言葉で投稿をつくる", dept: "制作スタジオ",
     beats: [
       { ...CLAUDE_SP, line: "制作スタジオへ。この人の言葉のまま、ちゃんと届く投稿にしてください。" },
-      { id: "content-creator", n: "content-creator", tag: "企画・ネタ出し", line: "ネタを3つに絞りました。いちばん『この人らしい』話から書きます。" },
+      { id: "content-creator", n: "発信企画係", tag: "企画・ネタ出し", line: "ネタを3つに絞りました。いちばん『この人らしい』話から書きます。" },
       { ...KENSHO, line: "待った。それ、誰にでも書ける文章になってない？　この人の声はどこ？" },
-      { id: "writing-crew-starter", n: "writing-crew", tag: "リサーチ・執筆", line: "現場の言い回しをそのまま残して、書き直しました。" },
-      { ...KENSHO, line: "その一文、いいですね。通します。承認デスクへ。" },
+      { id: "writing-crew-starter", n: "記事班", tag: "リサーチ・執筆", line: "現場の言い回しをそのまま残して、書き直しました。" },
+      { ...KENSHO, line: "その一文、いいですね。オーナーの机へ届けましょう。" },
     ],
     complete: { title: "あなたの言葉でできた投稿下書き", line: "発信は、続けられる形になってはじめて力になります。", sub: "投稿文3本・次のネタ帳つき。" } },
   { t: "この契約書、少し不安", s: "見落としや不利な条項を探す", dept: "専門職オフィス",
     beats: [
       { ...CLAUDE_SP, line: "専門職オフィスへ。この契約書の心配ごとを、全部拾ってください。" },
-      { id: "legal-advisor", n: "legal-advisor", tag: "契約書の見張り番", line: "気になる条項が2つ。自動更新と、解約予告の期限です。" },
+      { id: "legal-advisor", n: "契約見張り番", tag: "契約書の見張り番", line: "気になる条項が2つ。自動更新と、解約予告の期限です。" },
       { ...KENSHO, line: "待った。専門家ぶってない？　私たちは弁護士じゃない。" },
-      { id: "research-assistant", n: "research-assistant", tag: "根拠の裏取り", line: "自分たちで確かめられる根拠と、専門家に聞くべき論点を分けて整理しました。" },
-      { ...KENSHO, line: "線引きができたので通します。承認デスクへ。" },
+      { id: "research-assistant", n: "調査探検家", tag: "根拠の裏取り", line: "自分たちで確かめられる根拠と、専門家に聞くべき論点を分けて整理しました。" },
+      { ...KENSHO, line: "線引きができたので通します。あとはオーナーの机で。" },
     ],
     complete: { title: "リスク一覧と、専門家への質問リスト", line: "不安が『確認すべき点』に変わりました。", sub: "※最終判断は、弁護士など専門家と一緒に。" } },
   { t: "伝わる資料にしたい", s: "話の筋と見せ方をそろえる", dept: "制作スタジオ",
     beats: [
       { ...CLAUDE_SP, line: "制作スタジオへ。言いたいことが多すぎるみたい。話の筋を通してあげて。" },
-      { id: "slide-maker", n: "slide-maker", tag: "スライドの座組屋", line: "言いたいことを3つに絞って、1枚1メッセージで組みました。" },
+      { id: "slide-maker", n: "スライド班", tag: "スライドの座組屋", line: "言いたいことを3つに絞って、1枚1メッセージで組みました。" },
       { ...KENSHO, line: "待った。作った側の自己満になってない？　読む人は誰？" },
-      { id: "report-writer", n: "report-writer", tag: "報告書の仕立て屋", line: "読み手を決めて、『相手が知りたい順』に並べ替えました。" },
-      { ...KENSHO, line: "これは伝わります。承認デスクへ。" },
+      { id: "report-writer", n: "レポート班", tag: "報告書の仕立て屋", line: "読み手を決めて、『相手が知りたい順』に並べ替えました。" },
+      { ...KENSHO, line: "これは伝わります。オーナーの机へどうぞ。" },
     ],
     complete: { title: "伝わる構成のスライド下書き", line: "『言いたいこと』が『伝わること』に変わりました。", sub: "構成メモと発表用の台本つき。" } },
   { t: "根拠のある数字で決めたい", s: "出典のある情報を集める", dept: "リサーチラボ",
     beats: [
       { ...CLAUDE_SP, line: "リサーチラボへ。感覚ではなく、出典のある数字をお願いします。" },
-      { id: "research-assistant", n: "research-assistant", tag: "調査・出典明記", line: "3つのソースで裏を取りました。数字が食い違う箇所には印をつけています。" },
+      { id: "research-assistant", n: "調査探検家", tag: "調査・出典明記", line: "3つのソースで裏を取りました。数字が食い違う箇所には印をつけています。" },
       { ...KENSHO, line: "待った。都合のいい数字だけ集めてない？　反対のデータはどこ？" },
-      { id: "bizdev-strategist", n: "bizdev", tag: "分析・整理", line: "不利な数字も並べて、比較表にしました。これで公平に判断できます。" },
-      { ...KENSHO, line: "両面そろったので通します。承認デスクへ。" },
+      { id: "bizdev-strategist", n: "新規事業班", tag: "分析・整理", line: "不利な数字も並べて、比較表にしました。これで公平に判断できます。" },
+      { ...KENSHO, line: "両面そろったので通します。オーナーの机へ。" },
     ],
     complete: { title: "出典つき調査メモと比較表", line: "『たぶん』が『ここまで分かっている』に変わりました。", sub: "出典リンクつき。判断はあなたの手の中に。" } },
   { t: "案件を取りたい、売上を伸ばしたい", s: "提案・価格・届け方を設計する", dept: "経営企画部",
     beats: [
       { ...CLAUDE_SP, line: "経営企画部へ。この人の強みを、ちゃんと値段のつく形にしてください。" },
-      { id: "anken-coach-elite", n: "anken-coach-ELITE", tag: "案件獲得の伴走", line: "実績を棚卸ししました。負けない土俵はここです。" },
+      { id: "anken-coach-elite", n: "案件コーチ", tag: "案件獲得の伴走", line: "実績を棚卸ししました。負けない土俵はここです。" },
       { ...KENSHO, line: "待った。その提案、安売りしてない？　価値と価格、合ってる？" },
-      { id: "anken-sales-product-designer", n: "anken-sales-designer", tag: "提案・価格設計", line: "松竹梅の3段にして、真ん中に自信作を置きました。値付けの理由も言えます。" },
-      { ...KENSHO, line: "理由が言える値段なら通します。承認デスクへ。" },
+      { id: "anken-sales-product-designer", n: "営業設計士", tag: "提案・価格設計", line: "松竹梅の3段にして、真ん中に自信作を置きました。値付けの理由も言えます。" },
+      { ...KENSHO, line: "理由が言える値段なら合格。オーナーの机へ。" },
     ],
     complete: { title: "30日の行動プランと提案トーク", line: "『いつかやる』が『今日の一歩』に変わりました。", sub: "提案の台本と価格表つき。" } },
   { t: "サロンの現場を楽にしたい", s: "カルテ・お知らせ・口コミ返信", dept: "グルーミングサロン",
     beats: [
       { ...CLAUDE_SP, line: "サロンへ。現場の手を止めない形でお願いします。" },
-      { id: "grooming-assistant", n: "grooming-assistant", tag: "サロンの看板娘", line: "カルテの引き継ぎメモと、お客様へのお知らせを下書きしました。" },
+      { id: "grooming-assistant", n: "看板娘ひまりちゃん", tag: "サロンの看板娘", line: "カルテの引き継ぎメモと、お客様へのお知らせを下書きしました。" },
       { ...KENSHO, line: "待った。専門用語が多くない？　オーナーさんに伝わる言葉？" },
-      { id: "grooming-assistant", n: "grooming-assistant", tag: "サロンの看板娘", line: "トリマー以外にも分かる言い方に直して、写真の説明も添えました。" },
-      { ...KENSHO, line: "これは現場で使えます。承認デスクへ。" },
+      { id: "grooming-assistant", n: "看板娘ひまりちゃん", tag: "サロンの看板娘", line: "トリマー以外にも分かる言い方に直して、写真の説明も添えました。" },
+      { ...KENSHO, line: "これは現場で使えます。オーナーの机へお届けを。" },
     ],
     complete: { title: "引き継ぎメモ・返信文・お知らせ一式", line: "あなたは、接客と施術に集中できます。", sub: "ワンちゃんの名前入りで、あとは確認するだけ。" } },
 ];
@@ -733,29 +741,29 @@ const worry = document.createElement("section");
 worry.className = "worrysec";
 worry.innerHTML = `<div class="inner">
   <div class="seckicker">RECEPTION</div>
-  <h2 class="sechead fadein">あなたの困りごとを、<br>犬たちに渡してください。</h2>
-  <div class="secnote fadein">この先は、約90秒の小さな物語。<br>選んだ困りごとによって、動く部署と犬が変わります。</div>
+  <h2 class="sechead fadein">その困りごと、<br>丘の犬たちにまかせてみませんか。</h2>
+  <div class="secnote fadein">コーヒー一杯ぶんの、小さな見学ツアー。<br>選んだ困りごとで、動きだす犬たちが変わります。</div>
   <div class="reception fadein">
     ${charFace("claude", 6)}
-    <div class="bubble">「ようこそ、陽だまりの丘へ。<br>今日は、何にお困りですか？」</div>
+    <div class="bubble">「ようこそ、陽だまりの丘へ。<br>どんな困りごとをお持ちですか？」</div>
   </div>
   <div class="worrycards">${WORRIES.map((w, i) =>
-    `<div class="worrycard fadein" data-i="${i}"><div class="wt">${w.t}</div><div class="ws">${w.s}</div></div>`).join("")}</div>
-  <div class="flowpanel" id="flowpanel"></div>
+    `<div class="worrycard fadein" data-i="${i}" tabindex="0" role="button"><div class="wt">${w.t}</div><div class="ws">${w.s}</div></div>`).join("")}</div>
+  <div class="flowpanel" id="flowpanel" aria-live="polite"></div>
 </div>`;
 page.appendChild(worry);
 
 // --- おしごと劇場：クリックで進む紙芝居 ---
 const flowpanel = worry.querySelector("#flowpanel");
-const BEAT_LABELS = ["依頼をつなぐ", "仕事を進める", "いったん止める", "立て直す", "人へ戻す"];
+const BEAT_LABELS = ["おねがいの受けわたし", "おしごと中", "まったをかける", "たてなおし", "バトンをあなたへ"];
 const TH_TIMES = ["10:00", "10:03", "10:06", "10:09", "10:12", "10:15", "10:16"];
 let th = null; // { w: 選ばれた困りごと, idx: 0-4=リレー / 5=最終判断 / 6=完了 }
 
 function theaterHTML() {
   const w = th.w, idx = th.idx;
   const room = roomByName[w.dept];
-  const phase = idx < 5 ? (idx === 0 ? "COLD OPEN" : "THE RELAY ・ 0" + idx)
-              : idx === 5 ? "FINAL DECISION" : "COMPLETE";
+  const phase = idx < 5 ? (idx === 0 ? "MORNING CALL" : "PAW RELAY ・ 0" + idx)
+              : idx === 5 ? "YOUR CALL" : "WELL DONE";
   const prog = Array.from({ length: 7 }, (_, i) => `<span class="${i <= idx ? "on" : ""}"></span>`).join("");
   const bg = THEATER_IMAGES[w.dept]
     ? `background: linear-gradient(rgba(30,20,12,.5), rgba(30,20,12,.72)), url('${THEATER_IMAGES[w.dept]}') center/cover`
@@ -768,14 +776,14 @@ function theaterHTML() {
       <div class="th-card">
         <div class="th-sp">${charFace(b.id, 3)}<span class="th-name">${b.n}</span><span class="th-tag">${b.tag}</span>${b.badge ? `<span class="th-badge">${b.badge}</span>` : ""}</div>
         <div class="th-line">「${b.line}」</div>
-        <div class="th-foot"><span class="th-step">${idx + 1} / 5　${BEAT_LABELS[idx]}</span><button class="th-next" id="thNext">見届ける</button></div>
+        <div class="th-foot"><span class="th-step">${idx + 1} / 5　${BEAT_LABELS[idx]}</span><button class="th-next" id="thNext">つづきへ</button></div>
       </div>`;
   } else if (idx === 5) {
     mid = `<div class="th-dogs">${charFace("claude", 6)}</div>
       <div class="th-card" style="text-align:center">
-        <div class="th-sp" style="justify-content:center"><span class="th-badge" style="margin:0 auto">FINAL DESK ・ HUMAN ONLY</span></div>
+        <div class="th-sp" style="justify-content:center"><span class="th-badge" style="margin:0 auto">OWNER'S DESK ・ NO DOGS ALLOWED</span></div>
         <div class="th-line">「さいごの一手は、あなたのもの。」</div>
-        <div class="th-body">犬たちは、調べて、つくって、疑うところまで。<br>「これでいく」と決めるのは、あなたです。</div>
+        <div class="th-body">調べる・つくる・疑うまでが、犬たちの仕事。<br>「これでいく」のひと声だけは、あなたにしか出せません。</div>
         <button class="stampbtn" id="thStamp">🐾<br>あなたが<br>承 認</button>
       </div>`;
   } else {
@@ -785,12 +793,12 @@ function theaterHTML() {
       <div><span class="th-ctitle">できあがったもの：${c.title}</span></div>
       <div class="th-cline">${c.line}</div>
       <div class="th-csub">${c.sub || ""}</div>
-      <div class="th-cbtns"><button id="thRetry">別の仕事を頼む</button></div>
+      <div class="th-cbtns"><button id="thRetry">ほかの困りごとをえらぶ</button></div>
     </div>`;
   }
   return `<div class="theater" style="${bg}">
     <div class="th-head">
-      <div><div class="th-phase">${phase} ・ ${TH_TIMES[idx]}</div><div class="th-room">${idx === 5 ? "承認デスク" : w.dept}</div></div>
+      <div><div class="th-phase">${phase} ・ ${TH_TIMES[idx]}</div><div class="th-room">${idx === 5 ? "オーナーズデスク" : w.dept}</div></div>
       <div class="th-prog">${prog}</div>
     </div>
     ${mid}
@@ -813,14 +821,16 @@ function renderTheater() {
 }
 
 worry.querySelectorAll(".worrycard").forEach(card => {
-  card.addEventListener("click", () => {
+  const start = () => {
     worry.querySelectorAll(".worrycard").forEach(c => c.classList.remove("sel"));
     card.classList.add("sel");
     th = { w: WORRIES[+card.dataset.i], idx: 0 };
     renderTheater();
     flowpanel.classList.add("show");
     flowpanel.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
+  };
+  card.addEventListener("click", start);
+  card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); start(); } });
 });
 
 // --- 夜の締め ---
@@ -833,6 +843,7 @@ night.innerHTML = `
   <div class="body fadein">${STORY.closing.body}</div>
   <div class="fin fadein">${STORY.closing.fin}</div>
   <div class="fin2">${STORY.closing.fin2}</div>
+  <div class="fin3">※このページはAI活用のイメージデモです。法務・税務などの専門業務を提供するものではありません。</div>
   <div class="links">${STORY.links.map(l => `<a href="${l.href}">${l.label}</a>`).join("")}</div>`;
 page.appendChild(night);
 const nightstars = night.querySelector("#nightstars");
@@ -848,10 +859,12 @@ for (let i = 0; i < 50; i++) {
 
 // --- フロア一覧 → 各部署カードへジャンプ ---
 document.querySelectorAll(".dirrow").forEach(el => {
-  el.addEventListener("click", () => {
+  const go = () => {
     const t = document.getElementById("dept-" + el.dataset.room);
     if (t) t.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
+  };
+  el.addEventListener("click", go);
+  el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
 });
 
 // ================================================================
