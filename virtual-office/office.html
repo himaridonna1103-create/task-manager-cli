@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>himari company — Fantasy Office</title>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --panel: #2a2048;
+    --line: #6b58a8;
+    --frame: #3a3560;
+    --gold: #e8c15a;
+    --text: #efe8ff;
+    --sub: #a89ad0;
+    --active: #8affb0;
+    --glass: rgba(160, 190, 255, .35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: linear-gradient(180deg, #100b24 0%, #1c1240 55%, #2a1a50 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text);
+    font-family: 'DotGothic16', 'MS Gothic', monospace;
+    padding: 12px;
+    image-rendering: pixelated;
+    position: relative;
+    overflow-x: hidden;
+  }
+  #stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  #stars span { position: absolute; color: #cdbfff; animation: twinkle 3s infinite; }
+  @keyframes twinkle { 0%,100% { opacity: .15; } 50% { opacity: .9; } }
+
+  /* ============ アプリ風ウィンドウ ============ */
+  .app {
+    position: relative; z-index: 1;
+    max-width: 1560px; margin: 0 auto;
+    border: 3px solid var(--frame); border-radius: 12px;
+    background: #16112e; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 30px rgba(107,88,168,.25);
+  }
+  .titlebar {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 8px 14px; background: #1d1838; border-bottom: 2px solid var(--frame);
+  }
+  .dots { display: flex; gap: 5px; }
+  .dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .dots span:nth-child(1) { background: #ff6b6b; }
+  .dots span:nth-child(2) { background: #ffd166; }
+  .dots span:nth-child(3) { background: #7CFC98; }
+  .titlebar h1 { font-size: 15px; letter-spacing: 1px; color: var(--gold); text-shadow: 0 0 8px rgba(232,193,90,.5); }
+  .titlebar .clock { font-size: 12px; color: var(--sub); margin-left: auto; }
+  .titlebar .live { font-size: 12px; color: var(--active); }
+
+  .main { display: flex; align-items: stretch; }
+
+  /* ============ 左ナビ（部屋リスト） ============ */
+  .nav {
+    width: 150px; flex: 0 0 150px; background: #1a1533;
+    border-right: 2px solid var(--frame); padding: 12px 8px; font-size: 11px;
+  }
+  .nav .navtitle { color: var(--sub); font-size: 10px; margin: 6px 4px; }
+  .nav .item {
+    padding: 4px 8px; cursor: pointer; color: var(--sub); border-radius: 4px;
+    display: flex; align-items: center; gap: 6px; margin-bottom: 2px;
+  }
+  .nav .item:hover { color: #fff; background: rgba(255,255,255,.07); }
+  .nav .dot { width: 7px; height: 7px; border-radius: 2px; flex: 0 0 7px; }
+  @media (max-width: 1100px) { .nav { display: none; } }
+
+  /* ============ フロア ============ */
+  .floorwrap { flex: 1 1 auto; min-width: 0; padding: 14px; overflow-x: auto; }
+  .floor { display: flex; gap: 10px; align-items: stretch; min-width: 660px; }
+  .col { flex: 1 1 0; display: flex; flex-direction: column; gap: 10px; }
+  .col.center { flex: 1.06 1 0; }
+
+  .zone {
+    position: relative; flex: 1 0 auto;
+    border: 2px solid var(--glass); border-radius: 6px;
+    background: rgba(34,26,66,.8);
+    padding: 24px 6px 8px;
+    box-shadow: inset 0 0 24px rgba(120,90,220,.15), 0 3px 0 rgba(0,0,0,.35);
+  }
+  .zone::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 11px;
+    background: #4a3a63; border-radius: 4px 4px 0 0; border-bottom: 2px solid #241b3d;
+  }
+  .zone h2 {
+    position: absolute; top: -3px; left: 8px; z-index: 3;
+    font-size: 11px; padding: 1px 8px; background: #1d1838;
+    border: 2px solid; border-radius: 4px; white-space: nowrap;
+  }
+  .zone .desks {
+    display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; align-items: flex-end;
+    background-image:
+      linear-gradient(45deg, rgba(255,255,255,.03) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.03) 75%),
+      linear-gradient(45deg, rgba(255,255,255,.03) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.03) 75%);
+    background-size: 22px 22px; background-position: 0 0, 11px 11px;
+    border-radius: 4px; padding: 6px 2px 4px; min-height: 100px;
+  }
+  .zone .plant { position: absolute; bottom: 6px; right: 4px; opacity: .9; pointer-events: none; }
+
+  /* ============ 受付ホール ============ */
+  .zone.entry { text-align: center; }
+  .sign {
+    margin: 2px auto 6px; max-width: 250px;
+    background: linear-gradient(180deg, #101a3a, #182552);
+    border: 2px solid #3f5da8; border-radius: 6px; padding: 7px 10px;
+    box-shadow: 0 0 14px rgba(90,140,255,.35), inset 0 0 18px rgba(90,140,255,.15);
+  }
+  .sign .signtitle {
+    font-size: 15px; letter-spacing: 2px; color: #9fd8ff;
+    text-shadow: 0 0 10px rgba(120,190,255,.9);
+  }
+  .sign .signsub { font-size: 10px; color: #6f8fd0; margin-top: 2px; letter-spacing: 1px; }
+  .motto {
+    margin: 6px auto 2px; font-size: 11px; color: var(--gold);
+    background: rgba(0,0,0,.3); border: 2px solid rgba(232,193,90,.45);
+    border-radius: 4px; padding: 3px 8px; display: inline-block;
+  }
+
+  /* ============ 休憩ラウンジ ============ */
+  .lounge-inner { display: flex; align-items: flex-end; justify-content: center; gap: 10px; padding: 8px 0 4px; }
+  .lounge-inner .zzz { font-size: 14px; animation: floaty 3s ease-in-out infinite; }
+
+  /* ============ デスク ============ */
+  .desk {
+    width: 100px; text-align: center; position: relative;
+    padding: 6px 2px 4px; border: 2px solid transparent; border-radius: 4px;
+    cursor: pointer; user-select: none;
+  }
+  .desk:hover { background: rgba(255,255,255,.05); }
+  .desk .sprite { height: 92px; display: flex; align-items: flex-end; justify-content: center; }
+  .desk .name { font-size: 10px; margin-top: 4px; line-height: 1.25; word-break: break-all; }
+  .desk .breed { font-size: 9px; color: var(--gold); margin-top: 1px; opacity: .85; }
+  .desk.active {
+    border-color: var(--active);
+    background: radial-gradient(circle at 50% 60%, rgba(138,255,176,.22), transparent 70%);
+    box-shadow: 0 0 12px rgba(138,255,176,.45);
+  }
+  .desk.active .name { color: var(--active); }
+  .desk .badge {
+    display: none; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    background: var(--active); color: #0e331c; font-size: 9px; padding: 0 5px;
+    border: 2px solid #0e331c; white-space: nowrap; z-index: 4;
+  }
+  .desk.active .badge { display: block; animation: pop .6s infinite alternate; }
+  @keyframes pop { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(-3px); } }
+
+  /* --- 実績カード（ホバーで表示） --- */
+  .statcard {
+    display: none; position: absolute; bottom: calc(100% - 4px); left: 50%; transform: translateX(-50%);
+    background: #f5f0ff; color: #2a2044; border: 2px solid var(--line); border-radius: 4px;
+    font-size: 9px; line-height: 1.5; padding: 3px 7px; white-space: nowrap; z-index: 9; text-align: left;
+    box-shadow: 0 3px 8px rgba(0,0,0,.4);
+  }
+  .statcard b { color: #4a3690; }
+  .desk:hover .statcard { display: block; }
+
+  /* --- 働いている様子 --- */
+  .desk.active svg .dog { animation: bob 0.8s steps(2) infinite; }
+  @keyframes bob { 0% { transform: translateY(0); } 50% { transform: translateY(-2px); } 100% { transform: translateY(0); } }
+  .desk.active svg .ball { fill: #aef2c8; filter: drop-shadow(0 0 5px #8affb0); animation: glowpulse 1.2s infinite alternate; }
+  @keyframes glowpulse { from { filter: drop-shadow(0 0 3px #8affb0); } to { filter: drop-shadow(0 0 8px #8affb0); } }
+  .desk.active::after {
+    content: "✦"; position: absolute; top: 2px; right: 4px; color: var(--active);
+    font-size: 11px; animation: twinkle 1s infinite;
+  }
+  .desk.active svg .paw1 { animation: type .28s steps(2) infinite; }
+  .desk.active svg .paw2 { animation: type .28s steps(2) .14s infinite; }
+  @keyframes type { 0% { transform: translateY(0); } 50% { transform: translateY(-3px); } 100% { transform: translateY(0); } }
+  .workbubble {
+    display: none; position: absolute; top: 10px; left: 1px;
+    background: #d3ffe0; color: #0e331c; border: 2px solid #0e331c;
+    font-size: 8px; padding: 0 3px; z-index: 4;
+  }
+  .desk.active .workbubble { display: block; animation: pop2 .9s steps(2) infinite; }
+  @keyframes pop2 { 0% { transform: translateY(0); } 50% { transform: translateY(-2px); } 100% { transform: translateY(0); } }
+  .idlebubble {
+    position: absolute; top: 0; left: 4px; font-size: 13px;
+    opacity: 0; transition: opacity .5s; z-index: 4; pointer-events: none;
+  }
+  .idlebubble.show { opacity: 1; }
+  svg .eyes { animation: blink 4.5s infinite; }
+  @keyframes blink { 0%, 91%, 100% { opacity: 1; } 93%, 97% { opacity: 0; } }
+  svg .flame { animation: flicker 1.4s infinite; }
+  @keyframes flicker { 0%,100% { opacity: .95; } 40% { opacity: .55; } 70% { opacity: .85; } }
+
+  /* --- クリック反応 --- */
+  .desk.jump svg .dog { animation: jumpy .55s ease-out; }
+  @keyframes jumpy {
+    0% { transform: translateY(0); } 30% { transform: translateY(-9px); }
+    55% { transform: translateY(0); } 75% { transform: translateY(-4px); } 100% { transform: translateY(0); }
+  }
+  .speech {
+    display: none; position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+    background: #fff8e0; color: #4a3a10; border: 2px solid #8a6a20;
+    font-size: 9px; padding: 1px 6px; white-space: nowrap; z-index: 10;
+  }
+  .speech.show { display: block; animation: pop2 .5s steps(2) infinite; }
+  .heart {
+    position: absolute; left: 50%; top: 26px; font-size: 13px; color: #ff8fa3;
+    animation: rise 1s ease-out forwards; pointer-events: none; z-index: 5;
+  }
+  @keyframes rise { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, -26px); } }
+
+  .prop { display: flex; align-items: flex-end; padding: 0 2px 6px; opacity: .95; }
+  .prop.floaty svg, .floaty { animation: floaty 3s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+  /* --- 廊下を歩くワンちゃん --- */
+  #walkerWrap { position: fixed; bottom: 4px; left: 0; width: 100%; height: 70px; pointer-events: none; z-index: 20; }
+  #walker { position: absolute; bottom: 0; left: -130px; }
+  #walker.walking { animation: cross 20s linear forwards; }
+  @keyframes cross { from { left: -130px; } to { left: 104%; } }
+  #walker svg { animation: hop .45s steps(2) infinite; }
+  @keyframes hop { 0% { transform: translateY(0); } 50% { transform: translateY(-3px); } 100% { transform: translateY(0); } }
+
+  /* ============ 右サイドバー ============ */
+  .sidebar {
+    width: 270px; flex: 0 0 270px; background: #1a1533;
+    border-left: 2px solid var(--frame); padding: 12px 10px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  @media (max-width: 900px) { .main { flex-wrap: wrap; } .sidebar { width: 100%; flex: 1 1 100%; border-left: none; border-top: 2px solid var(--frame); } }
+  .panel {
+    border: 2px solid var(--line); background: var(--panel);
+    border-radius: 6px; padding: 8px 10px;
+  }
+  .panel h3 { font-size: 12px; color: var(--gold); margin-bottom: 6px; }
+  .stats { display: flex; gap: 8px; }
+  .stat { flex: 1; text-align: center; background: rgba(0,0,0,.3); border-radius: 4px; padding: 6px 2px; }
+  .stat .num { font-size: 20px; color: #fff; }
+  .stat .lbl { font-size: 9px; color: var(--sub); margin-top: 2px; }
+  .nowlist { font-size: 11px; line-height: 1.7; }
+  .nowlist .none { color: var(--sub); }
+  .nowlist .on { color: var(--active); }
+  .loglist { font-size: 10px; line-height: 1.8; max-height: 260px; overflow-y: auto; }
+  .loglist .t { color: var(--sub); margin-right: 5px; }
+  .loglist .start { color: var(--active); }
+  .loglist .stop { color: #ff9ea0; }
+  .foot { font-size: 9px; color: var(--sub); margin-top: 8px; }
+  button.demo {
+    font-family: inherit; font-size: 11px; cursor: pointer;
+    background: var(--gold); color: #33280a; border: 3px solid #33280a;
+    border-radius: 4px; padding: 4px 10px; margin-top: 6px;
+  }
+  button.demo:active { transform: translateY(2px); }
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div id="walkerWrap"><div id="walker"></div></div>
+
+<div class="app">
+  <div class="titlebar">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <h1>✦ himari company</h1>
+    <span class="live" id="liveState">● 待機中</span>
+    <span class="clock" id="clock"></span>
+  </div>
+  <div class="main">
+    <nav class="nav" id="nav">
+      <div class="navtitle">— フロアマップ —</div>
+    </nav>
+    <div class="floorwrap"><div class="floor" id="floor"></div></div>
+    <div class="sidebar">
+      <div class="panel">
+        <h3>✦ 本日の勤怠</h3>
+        <div class="stats">
+          <div class="stat"><div class="num" id="stToday">0</div><div class="lbl">今日の稼働</div></div>
+          <div class="stat"><div class="num" id="stTotal">0</div><div class="lbl">累計稼働</div></div>
+          <div class="stat"><div class="num" id="stActive">0</div><div class="lbl">現在稼働中</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>✦ いま働いているワンちゃん</h3>
+        <div class="nowlist" id="nowList"><span class="none">全員お昼寝中…💤</span></div>
+      </div>
+      <div class="panel">
+        <h3>✦ 出勤ログ</h3>
+        <div class="loglist" id="logList"><span class="t">まだログがありません</span></div>
+      </div>
+      <div class="panel">
+        <h3>✦ 操作</h3>
+        <button class="demo" id="demoBtn">デモ再生（動きを確認）</button>
+        <div class="foot">データは5秒ごとに自動更新。<br>デスクにマウスを乗せると実績カード、クリックでご挨拶🐾</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ 犬種ドット絵の型 ============
+// C=毛色メイン D=差し色(耳・マスク・斑) M=マズル/胸 F=ふわ毛 E=目 N=鼻
+const ARCHETYPES = {
+  pointy: [
+    "DD........DD",
+    "DCD......DCD",
+    ".CCCCCCCCCC.",
+    ".CCCCCCCCCC.",
+    ".CCECCCCECC.",
+    ".CCCCMMCCCC.",
+    ".CCMMMMMMCC.",
+    "..CMMNNMMC..",
+    "...MMMMMM...",
+    "..CCCCCCCC..",
+    ".CCCCCCCCCC.",
+  ],
+  floppy: [
+    "....CCCC....",
+    "..CCCCCCCC..",
+    ".DCCCCCCCCD.",
+    "DDCCCCCCCCDD",
+    "DDCECCCCECDD",
+    "DDCCCMMCCCDD",
+    "DD.CMMMMC.DD",
+    "....MNNM....",
+    "....MMMM....",
+    "..CCCCCCCC..",
+    ".CCCCCCCCCC.",
+  ],
+  longear: [
+    "....CCCC....",
+    "..CCCCCCCC..",
+    ".DCCCCCCCCD.",
+    "DDCCCCCCCCDD",
+    "DDCECCCCECDD",
+    "DDCCCMMCCCDD",
+    "DDCMMMMMMCDD",
+    "DD..MNNM..DD",
+    "DD..MMMM..DD",
+    "..CCCCCCCC..",
+    ".CCCCCCCCCC.",
+  ],
+  fluffy: [
+    "...FFFFFF...",
+    "..FFFFFFFF..",
+    ".FFCCCCCCFF.",
+    "FFCCCCCCCCFF",
+    "FFCECCCCECFF",
+    "FFCCMMMMCCFF",
+    ".F.CMNNMC.F.",
+    "....MMMM....",
+    "..FCCCCCCF..",
+    ".FCCCCCCCCF.",
+  ],
+  flat: [
+    ".DD......DD.",
+    ".DCC....CCD.",
+    ".CCCCCCCCCC.",
+    ".CCCCCCCCCC.",
+    ".CCECCCCECC.",
+    ".CCDDDDDDCC.",
+    "..CDDNNDDC..",
+    "...DDDDDD...",
+    "..CCCCCCCC..",
+    ".CCCCCCCCCC.",
+  ],
+};
+
+// 各メンバーの犬種設定 { b:犬種名, a:型, C, D, M, F, spots }
+const BREEDS = {
+  "claude":                     { b:"プードル",             a:"fluffy",  C:"#f7f3e8", D:"#e5ddc8", M:"#fffdf5", F:"#fffef8" },
+  "secretary":                  { b:"トイプードル",         a:"fluffy",  C:"#b9895a", D:"#9c7048", M:"#c99a6b", F:"#cfa87e" },
+  "meeting-supporter":          { b:"ボーダーコリー",       a:"floppy",  C:"#3a3a42", D:"#232329", M:"#f5f2ec" },
+  "meeting-summarizer":         { b:"シェルティ",           a:"pointy",  C:"#b5763a", D:"#8a5426", M:"#f7efe2" },
+  "morning":                    { b:"柴犬",                 a:"pointy",  C:"#d98f4e", D:"#b56f33", M:"#f7e8d3" },
+  "goal-tracker":               { b:"ジャックラッセル",     a:"floppy",  C:"#f2ead8", D:"#b5763a", M:"#fdf8ee" },
+  "spreadsheet-operator":       { b:"ウェルシュコーギー",   a:"pointy",  C:"#dd8f4f", D:"#c47332", M:"#fdf6ea" },
+  "writing-crew-starter":       { b:"ビーグル",             a:"longear", C:"#c98a4b", D:"#6b4a2b", M:"#f2e6d0" },
+  "slide-maker":                { b:"ポメラニアン",         a:"fluffy",  C:"#e8a95e", D:"#cc8f47", M:"#f5d9ad", F:"#f2c78a" },
+  "report-writer":              { b:"Mシュナウザー",        a:"floppy",  C:"#8f8f9c", D:"#6e6e7a", M:"#dcdce4" },
+  "content-creator":            { b:"チワワ",               a:"pointy",  C:"#e6c391", D:"#cba36f", M:"#f5e9d5" },
+  "design-consultant":          { b:"アフガンハウンド",     a:"longear", C:"#d9c49a", D:"#b09468", M:"#e8d8b5" },
+  "image-prompt-generator":     { b:"シベリアンハスキー",   a:"pointy",  C:"#9aa5b5", D:"#6e7a8c", M:"#f7f7fa" },
+  "text-quality-checker":       { b:"ダルメシアン",         a:"floppy",  C:"#f5f2ec", D:"#2b2b2b", M:"#ffffff", spots:true },
+  "bizdev-strategist":          { b:"ドーベルマン",         a:"pointy",  C:"#33303a", D:"#1c1a22", M:"#a06a3f" },
+  "marketing-strategist":       { b:"フレンチブルドッグ",   a:"flat",    C:"#d8cfc2", D:"#57504a", M:"#e8e0d3" },
+  "anken-coach-elite":          { b:"ジャーマンシェパード", a:"pointy",  C:"#a0713d", D:"#33302a", M:"#8a5a2b" },
+  "anken-sales-product-designer":{ b:"ボストンテリア",      a:"flat",    C:"#3a3a46", D:"#22222c", M:"#f0f0f0" },
+  "accounting-helper":          { b:"ダックスフンド",       a:"longear", C:"#7a4a26", D:"#55371e", M:"#8a5a33" },
+  "legal-advisor":              { b:"セントバーナード",     a:"floppy",  C:"#f2e8d5", D:"#a35c2e", M:"#faf3e5" },
+  "hiring-assistant":           { b:"ラブラドール",         a:"floppy",  C:"#e8d5a8", D:"#d4bd8a", M:"#f0e4c4" },
+  "learning-advisor":           { b:"ゴールデンレトリバー", a:"floppy",  C:"#d9a852", D:"#c39440", M:"#e8c987" },
+  "customer-support-advisor":   { b:"キャバリア",           a:"longear", C:"#f2ead8", D:"#b5642e", M:"#fdf8ee" },
+  "research-assistant":         { b:"ウィペット",           a:"pointy",  C:"#b8b3c4", D:"#948fa3", M:"#e8e5ee" },
+  "academic-scout":             { b:"バセットハウンド",     a:"longear", C:"#d9a35e", D:"#6b4a2b", M:"#f0e0c8" },
+  "engineer-assistant":         { b:"秋田犬",               a:"pointy",  C:"#e0b380", D:"#c49760", M:"#f7ede0" },
+  "security-guard":             { b:"ロットワイラー",       a:"floppy",  C:"#2d2a32", D:"#1a181f", M:"#a06a3f" },
+  "agent-team-builder":         { b:"オーストラリアンシェパード", a:"floppy", C:"#8a94a0", D:"#4a525c", M:"#f5f2ec", spots:true },
+  "create-vault":               { b:"パグ",                 a:"flat",    C:"#d8b98a", D:"#4a4038", M:"#e5cba0" },
+  "make-claudemd":              { b:"マルチーズ",           a:"fluffy",  C:"#f5f2ea", D:"#e5e0d2", M:"#ffffff", F:"#fffef8" },
+  "elite-agent-upgrade-wizard": { b:"シーズー",             a:"fluffy",  C:"#d8c4a8", D:"#b5a184", M:"#efe6d5", F:"#efe6d5" },
+  "grooming-assistant":         { b:"ビションフリーゼ",     a:"fluffy",  C:"#ffffff", D:"#efece2", M:"#ffffff", F:"#f5f3ec" },
+};
+
+// ============ クリック時のセリフ集 ============
+const SPEAK = {
+  "claude":                     ["わん！なんでも聞いてね", "今日もがんばろう✦"],
+  "secretary":                  ["ご予定を確認しますね📅", "メールの下書き作ります！"],
+  "meeting-supporter":          ["議事録おまかせ！", "会議まとめますね"],
+  "meeting-summarizer":         ["要点まとめました！", "文字起こしどうぞ"],
+  "morning":                    ["おはようわん！☀", "今日の段取りどうぞ"],
+  "goal-tracker":               ["目標、順調ですか？", "振り返りしましょ！"],
+  "spreadsheet-operator":       ["スプシ整えます📊", "VLOOKUPは得意！"],
+  "writing-crew-starter":       ["記事書くわん✍", "リサーチから始めよう"],
+  "slide-maker":                ["スライド作るよ！", "デザインおまかせ✨"],
+  "report-writer":              ["レポートまとめます", "報告書おまかせ！"],
+  "content-creator":            ["投稿ネタあるよ！", "バズらせたいわん"],
+  "design-consultant":          ["配色のご相談どうぞ🎨", "エレガントにいきましょ"],
+  "image-prompt-generator":     ["プロンプト作るよ！", "どんな画像にする？"],
+  "text-quality-checker":       ["誤字は見逃さないわん！", "チェックします🔍"],
+  "bizdev-strategist":          ["市場を分析中…", "勝ち筋を探すわん"],
+  "marketing-strategist":       ["集客のご相談どうぞ！", "SNS伸ばそう📈"],
+  "anken-coach-elite":          ["高単価いけるわん！", "案件取りにいこう🔥"],
+  "anken-sales-product-designer":["提案トーク磨こう！", "クロージング得意だよ"],
+  "accounting-helper":          ["仕訳しますね💰", "領収書ください！"],
+  "legal-advisor":              ["契約書チェックします", "リスクは早めに相談！"],
+  "hiring-assistant":           ["採用のご相談どうぞ", "公平が一番だわん"],
+  "learning-advisor":           ["学習計画立てよう📚", "一緒に成長しよう！"],
+  "customer-support-advisor":   ["お問い合わせ対応します", "お客様第一だわん"],
+  "research-assistant":         ["調査してきます🔍", "出典も確認済み！"],
+  "academic-scout":             ["論文読んでるわん📄", "最新研究チェック中"],
+  "engineer-assistant":         ["コードレビューします", "設計から相談してね"],
+  "security-guard":             ["ここは通さないわん！", "APIキー大丈夫？🔒"],
+  "agent-team-builder":         ["チーム作るわん！", "役割分担が大事"],
+  "create-vault":               ["資料庫作ろう！", "フォルダ整えるわん"],
+  "make-claudemd":              ["ルールブック磨くよ", "CLAUDE.md見せて！"],
+  "elite-agent-upgrade-wizard": ["新版に更新するわん", "カスタムは守るよ！"],
+  "grooming-assistant":         ["シャンプー日和です🛁", "ふわふわにするわん✂"],
+};
+const SPEAK_FALLBACK = ["わん！", "くぅ〜ん", "へへっ🐾"];
+
+// ============ 部屋の家具（ドット絵） ============
+const PLANT = { map: [
+    "..G.GG.G..",
+    ".GGGGGGGG.",
+    "..GGGGGG..",
+    "....GG....",
+    "...TTTT...",
+    "..TTTTTT..",
+  ], pal: { G:"#5fae62", T:"#a5602f" } };
+const PROPS = {
+  "秘書室": { map: [
+      "....PP....",
+      "...PPPP...",
+      "..P.PP.P..",
+      "....GG....",
+      "...WWWW...",
+      "...WLLW...",
+      "...WWWW...",
+    ], pal: { P:"#ff9ecf", G:"#5fae62", W:"#cdbfff", L:"#8a7ab5" } },
+  "制作スタジオ": { map: [
+      "..WWWWWW..",
+      ".WPPPPPPW.",
+      ".WPRRBBPW.",
+      ".WPPGGPPW.",
+      ".WPPPPPPW.",
+      "..W....W..",
+      ".W......W.",
+    ], pal: { W:"#7a5a36", P:"#f5f0e0", R:"#e07070", B:"#7fb8ff", G:"#e8c15a" } },
+  "経営企画部": { map: [
+      "WWWWWWWWWW",
+      "WFFFFFFFFW",
+      "WFRRFGGFFW",
+      "WFFBBFFRFW",
+      "WFFFFFFFFW",
+      "WWWWWWWWWW",
+      "...W..W...",
+    ], pal: { W:"#5c4a7a", F:"#f0ecf5", R:"#e07070", B:"#7fb8ff", G:"#5fae62" } },
+  "専門職オフィス": { map: [
+      "WWWWWWWWWW",
+      "WRBYGRBYGW",
+      "WWWWWWWWWW",
+      "WYGRBYGRBW",
+      "WWWWWWWWWW",
+      "WBRYGBRYGW",
+      "WWWWWWWWWW",
+    ], pal: { W:"#6b4a2b", R:"#c05656", B:"#5a7ab5", Y:"#d9b552", G:"#5c8a5e" } },
+  "リサーチラボ": { floaty: true, map: [
+      "...P..P...",
+      "..P....P..",
+      "..GGGGGG..",
+      ".GGLLLLGG.",
+      ".GLLLLLLG.",
+      "..GGGGGG..",
+      "...G..G...",
+    ], pal: { G:"#3a3550", L:"#7dffba", P:"#7dffba" } },
+  "技術部": { map: [
+      "DDDDDDDDDD",
+      "DGGDDDDRRD",
+      "DDDDDDDDDD",
+      "DBBDDDDGGD",
+      "DDDDDDDDDD",
+      "DRRDDDDBBD",
+      "DDDDDDDDDD",
+    ], pal: { D:"#2a2438", G:"#7dffba", R:"#ff7d7d", B:"#7fb8ff" } },
+  "グルーミングサロン": { map: [
+      "..P..P.P..",
+      ".P..P.....",
+      ".WWWWWWWW.",
+      ".WLLLLLLW.",
+      ".WLLLLLLW.",
+      ".WWWWWWWW.",
+      "..W....W..",
+    ], pal: { W:"#f0ecf5", L:"#9fd8ff", P:"#e5f4ff" } },
+};
+const SOFA = { map: [
+    ".RRRRRRRRRR.",
+    "RRWWWWWWWWRR",
+    "RRWWWWWWWWRR",
+    "RRRRRRRRRRRR",
+    ".RR......RR.",
+  ], pal: { R:"#8a5470", W:"#c9a2b8" } };
+const TABLE = { map: [
+    "..WWWWWW..",
+    ".WWWWWWWW.",
+    "...W..W...",
+    "...W..W...",
+  ], pal: { W:"#7a5a36" } };
+
+// ============ メンバー名簿（部署ごと） ============
+const ROOMS = [
+  { name: "受付", color: "#e8c15a", members: [
+    { id: "claude", label: "Claude（所長）" },
+  ]},
+  { name: "秘書室", color: "#8affb0", members: [
+    { id: "secretary", label: "secretary" },
+    { id: "meeting-supporter", label: "meeting-supporter" },
+    { id: "meeting-summarizer", label: "meeting-summarizer" },
+    { id: "morning", label: "morning" },
+    { id: "goal-tracker", label: "goal-tracker" },
+    { id: "spreadsheet-operator", label: "spreadsheet-operator" },
+  ]},
+  { name: "制作スタジオ", color: "#ff9ecf", members: [
+    { id: "writing-crew-starter", label: "writing-crew（記事班）" },
+    { id: "slide-maker", label: "slide-maker（スライド班）" },
+    { id: "report-writer", label: "report-writer（レポート班）" },
+    { id: "content-creator", label: "content-creator" },
+    { id: "design-consultant", label: "design-consultant" },
+    { id: "image-prompt-generator", label: "image-prompt-gen" },
+    { id: "text-quality-checker", label: "text-quality-checker" },
+  ]},
+  { name: "経営企画部", color: "#7fb8ff", members: [
+    { id: "bizdev-strategist", label: "bizdev（新規事業班）" },
+    { id: "marketing-strategist", label: "marketing-strategist" },
+    { id: "anken-coach-elite", label: "anken-coach-ELITE" },
+    { id: "anken-sales-product-designer", label: "anken-sales-designer" },
+  ]},
+  { name: "専門職オフィス", color: "#c9a2ff", members: [
+    { id: "accounting-helper", label: "accounting-helper" },
+    { id: "legal-advisor", label: "legal-advisor" },
+    { id: "hiring-assistant", label: "hiring-assistant" },
+    { id: "learning-advisor", label: "learning-advisor" },
+    { id: "customer-support-advisor", label: "CS-advisor" },
+  ]},
+  { name: "リサーチラボ", color: "#6fe3d6", members: [
+    { id: "research-assistant", label: "research-assistant" },
+    { id: "academic-scout", label: "academic-scout" },
+  ]},
+  { name: "技術部", color: "#ffb26b", members: [
+    { id: "engineer-assistant", label: "engineer-assistant" },
+    { id: "security-guard", label: "security-guard" },
+    { id: "agent-team-builder", label: "agent-team-builder" },
+    { id: "create-vault", label: "create-vault" },
+    { id: "make-claudemd", label: "make-claudemd" },
+    { id: "elite-agent-upgrade-wizard", label: "upgrade-wizard" },
+  ]},
+  { name: "グルーミングサロン", color: "#ff8fa3", members: [
+    { id: "grooming-assistant", label: "grooming-assistant（ひまりちゃん）" },
+  ]},
+];
+
+// フロア配置（3列レイアウト）
+const FLOOR_PLAN = [
+  ["秘書室", "経営企画部", "技術部"],
+  ["__entry__", "専門職オフィス", "__lounge__"],
+  ["制作スタジオ", "リサーチラボ", "グルーミングサロン"],
+];
+
+// イベント名 → デスクの対応（チーム所属エージェントは班のデスクへ）
+function resolveDesk(rawName) {
+  if (!rawName) return null;
+  let n = String(rawName).toLowerCase().trim();
+  const all = new Set(ROOMS.flatMap(r => r.members.map(m => m.id)));
+  const tryName = (x) => all.has(x) ? x : null;
+  if (tryName(n)) return n;
+  if (n.endsWith("-advocate")) { const b = tryName(n.replace(/-advocate$/, "")); if (b) return b; }
+  if (n.startsWith("slide-")) return "slide-maker";
+  if (n.startsWith("report-")) return "report-writer";
+  if (n.startsWith("bizdev-")) return "bizdev-strategist";
+  if (n.startsWith("crew-") || n.startsWith("writing-crew")) return "writing-crew-starter";
+  if (n.startsWith("anken-coach")) return "anken-coach-elite";
+  if (n === "executive-secretary") return "secretary";
+  if (n.includes("meeting-summar")) return "meeting-summarizer";
+  return "claude"; // 不明なものは所長席へ
+}
+
+// ============ ドット絵SVG生成 ============
+function hashCode(s) { let h = 0; for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; } return Math.abs(h); }
+
+function dogRects(id, P, offX) {
+  const br = BREEDS[id] || { b:"ミックス", a:"floppy", C:"#c98a4b", D:"#8a5a2b", M:"#f2e6d0" };
+  const map = ARCHETYPES[br.a];
+  const h = hashCode(id);
+  const colorOf = (c, x, y) => {
+    if (c === "M") return br.M || br.C;
+    if (c === "F") return br.F || br.C;
+    if (c === "D") return br.D || br.C;
+    if (br.spots && ((x * 7 + y * 13 + h) % 8 === 0)) return br.D;
+    return br.C;
+  };
+  let body = "", eyes = "";
+  map.forEach((row, y) => {
+    [...row].forEach((c, x) => {
+      if (c === ".") return;
+      if (c === "E") { eyes += `<rect x="${x*P+offX}" y="${y*P}" width="${P}" height="${P}" fill="#1e1a14"/>`; return; }
+      if (c === "N") { body += `<rect x="${x*P+offX}" y="${y*P}" width="${P}" height="${P}" fill="#26201a"/>`; return; }
+      body += `<rect x="${x*P+offX}" y="${y*P}" width="${P}" height="${P}" fill="${colorOf(c,x,y)}"/>`;
+    });
+  });
+  return { body, eyes, rows: map.length, br };
+}
+
+function spriteSVG(id) {
+  const P = 6;
+  const W = 14 * P;
+  const offX = (W - 12 * P) / 2;
+  const d = dogRects(id, P, offX);
+  const deskY = d.rows * P - P * 0.4;
+  const pawC = d.br.M || d.br.C;
+  return `<svg width="${W}" height="${deskY + 2.2*P}" xmlns="http://www.w3.org/2000/svg">
+    <g class="dog">${d.body}<g class="eyes" style="animation-delay:${(hashCode(id)%40)/10}s">${d.eyes}</g></g>
+    <rect x="0" y="${deskY}" width="${W}" height="${1.2*P}" fill="#7a5a36"/>
+    <rect x="0" y="${deskY+1.2*P}" width="${W}" height="${0.7*P}" fill="#5c4228"/>
+    <rect class="paw1" x="${5.2*P}" y="${deskY-0.6*P}" width="${1*P}" height="${0.6*P}" fill="${pawC}"/>
+    <rect class="paw2" x="${7.6*P}" y="${deskY-0.6*P}" width="${1*P}" height="${0.6*P}" fill="${pawC}"/>
+    <rect x="${2.6*P}" y="${deskY-0.5*P}" width="${1.8*P}" height="${0.5*P}" fill="#4a3a58"/>
+    <circle class="ball" cx="${3.5*P}" cy="${deskY-1.5*P}" r="${1.2*P}" fill="#5a4f7d"/>
+    <rect x="${10.2*P}" y="${deskY-1.5*P}" width="${0.8*P}" height="${1.5*P}" fill="#e8e0d0"/>
+    <rect class="flame" x="${10.3*P}" y="${deskY-2.3*P}" width="${0.6*P}" height="${0.8*P}" fill="#ffb347"/>
+  </svg>`;
+}
+
+function walkerSVG(id) {
+  const P = 5;
+  const d = dogRects(id, P, 0);
+  return `<svg width="${12*P}" height="${d.rows*P}" xmlns="http://www.w3.org/2000/svg">${d.body}${d.eyes}</svg>`;
+}
+
+function pixelSVG(prop, P) {
+  P = P || 5;
+  const map = prop.map, pal = prop.pal;
+  const w = Math.max(...map.map(r => r.length)) * P;
+  let rects = "";
+  map.forEach((row, y) => {
+    [...row].forEach((c, x) => {
+      if (c === "." || !pal[c]) return;
+      rects += `<rect x="${x*P}" y="${y*P}" width="${P}" height="${P}" fill="${pal[c]}"/>`;
+    });
+  });
+  return `<svg width="${w}" height="${map.length*P}" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
+}
+
+// ============ フロア描画 ============
+const floorEl = document.getElementById("floor");
+const navEl = document.getElementById("nav");
+const roomByName = Object.fromEntries(ROOMS.map(r => [r.name, r]));
+
+function makeDesk(m) {
+  const br = BREEDS[m.id];
+  const d = document.createElement("div");
+  d.className = "desk";
+  d.id = "desk-" + m.id;
+  d.innerHTML = `<span class="badge">おしごと中！</span>
+    <span class="workbubble">ｶﾀｶﾀｶﾀ…</span>
+    <span class="idlebubble"></span>
+    <span class="speech"></span>
+    <span class="statcard" id="stat-${m.id}"></span>
+    <div class="sprite">${spriteSVG(m.id)}</div>
+    <div class="name">${m.label}</div>
+    <div class="breed">${br ? br.b : ""}</div>`;
+  d.addEventListener("click", () => react(m.id, d));
+  return d;
+}
+
+function makeZone(room) {
+  const z = document.createElement("section");
+  z.className = "zone";
+  z.id = "zone-" + room.name;
+  z.style.background = `color-mix(in srgb, ${room.color} 7%, rgba(34,26,66,.85))`;
+  z.innerHTML = `<h2 style="border-color:${room.color};color:${room.color}">✦ ${room.name}</h2>`;
+  const desks = document.createElement("div");
+  desks.className = "desks";
+  room.members.forEach(m => desks.appendChild(makeDesk(m)));
+  const prop = PROPS[room.name];
+  if (prop) {
+    const p = document.createElement("div");
+    p.className = "prop" + (prop.floaty ? " floaty" : "");
+    p.innerHTML = pixelSVG(prop);
+    desks.appendChild(p);
+  }
+  z.appendChild(desks);
+  const plant = document.createElement("div");
+  plant.className = "plant";
+  plant.innerHTML = pixelSVG(PLANT, 4);
+  z.appendChild(plant);
+  return z;
+}
+
+function makeEntry() {
+  const room = roomByName["受付"];
+  const z = document.createElement("section");
+  z.className = "zone entry";
+  z.id = "zone-受付";
+  z.style.background = `color-mix(in srgb, ${room.color} 8%, rgba(34,26,66,.85))`;
+  z.innerHTML = `<h2 style="border-color:${room.color};color:${room.color}">✦ 受付</h2>
+    <div class="sign">
+      <div class="signtitle">✦ HIMARI COMPANY ✦</div>
+      <div class="signsub">We build. You grow. 📈</div>
+    </div>`;
+  const desks = document.createElement("div");
+  desks.className = "desks";
+  desks.style.minHeight = "auto";
+  room.members.forEach(m => desks.appendChild(makeDesk(m)));
+  z.appendChild(desks);
+  const motto = document.createElement("div");
+  motto.className = "motto";
+  motto.textContent = "「小さく始めて、大きく育てる。」";
+  z.appendChild(motto);
+  return z;
+}
+
+function makeLounge() {
+  const z = document.createElement("section");
+  z.className = "zone";
+  z.id = "zone-休憩ラウンジ";
+  z.style.background = "color-mix(in srgb, #c9a2b8 7%, rgba(34,26,66,.85))";
+  z.innerHTML = `<h2 style="border-color:#c9a2b8;color:#e0b8cf">✦ 休憩ラウンジ</h2>
+    <div class="lounge-inner">
+      <div>${pixelSVG(SOFA, 6)}</div>
+      <span class="zzz">☕</span>
+      <div>${pixelSVG(TABLE, 6)}</div>
+      <span class="zzz" style="animation-delay:1.5s">💤</span>
+    </div>`;
+  const plant = document.createElement("div");
+  plant.className = "plant";
+  plant.innerHTML = pixelSVG(PLANT, 4);
+  z.appendChild(plant);
+  return z;
+}
+
+FLOOR_PLAN[0].forEach(() => {});
+const colDefs = [[], [], []];
+FLOOR_PLAN.forEach((col, i) => { colDefs[i] = col; });
+colDefs.forEach((names, i) => {
+  const col = document.createElement("div");
+  col.className = "col" + (i === 1 ? " center" : "");
+  names.forEach(nm => {
+    if (nm === "__entry__") col.appendChild(makeEntry());
+    else if (nm === "__lounge__") col.appendChild(makeLounge());
+    else col.appendChild(makeZone(roomByName[nm]));
+  });
+  floorEl.appendChild(col);
+});
+
+// 左ナビ
+[...ROOMS.map(r => ({ n: r.name, c: r.color })), { n: "休憩ラウンジ", c: "#c9a2b8" }].forEach(r => {
+  const it = document.createElement("div");
+  it.className = "item";
+  it.innerHTML = `<span class="dot" style="background:${r.c}"></span>${r.n}`;
+  it.addEventListener("click", () => {
+    const z = document.getElementById("zone-" + r.n);
+    if (z) { z.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  });
+  navEl.appendChild(it);
+});
+
+// ============ クリック反応 ============
+function react(id, desk) {
+  desk.classList.remove("jump");
+  void desk.offsetWidth;
+  desk.classList.add("jump");
+  setTimeout(() => desk.classList.remove("jump"), 600);
+
+  const lines = SPEAK[id] || SPEAK_FALLBACK;
+  const speech = desk.querySelector(".speech");
+  speech.textContent = Math.random() < 0.15
+    ? SPEAK_FALLBACK[Math.floor(Math.random() * SPEAK_FALLBACK.length)]
+    : lines[Math.floor(Math.random() * lines.length)];
+  speech.classList.add("show");
+  clearTimeout(speech._t);
+  speech._t = setTimeout(() => speech.classList.remove("show"), 1900);
+
+  const h = document.createElement("span");
+  h.className = "heart";
+  h.textContent = "♥";
+  desk.appendChild(h);
+  setTimeout(() => h.remove(), 1000);
+}
+
+// ============ 星空 ============
+const stars = document.getElementById("stars");
+for (let i = 0; i < 70; i++) {
+  const s = document.createElement("span");
+  s.textContent = Math.random() < 0.3 ? "✦" : "·";
+  s.style.left = Math.random() * 100 + "%";
+  s.style.top = Math.random() * 100 + "%";
+  s.style.fontSize = (8 + Math.random() * 8) + "px";
+  s.style.animationDelay = (Math.random() * 3) + "s";
+  stars.appendChild(s);
+}
+
+// ============ 休憩中の吹き出し（ランダム） ============
+const IDLE_EMOJI = ["💤", "☕", "🦴", "📖", "🐾", "🎾"];
+setInterval(() => {
+  const idle = [...document.querySelectorAll(".desk:not(.active)")];
+  if (!idle.length) return;
+  const el = idle[Math.floor(Math.random() * idle.length)];
+  const bub = el.querySelector(".idlebubble");
+  if (!bub || bub.classList.contains("show")) return;
+  bub.textContent = IDLE_EMOJI[Math.floor(Math.random() * IDLE_EMOJI.length)];
+  bub.classList.add("show");
+  setTimeout(() => bub.classList.remove("show"), 2200);
+}, 1800);
+
+// ============ 廊下を歩くワンちゃん ============
+const walker = document.getElementById("walker");
+function sendWalker() {
+  const ids = Object.keys(BREEDS);
+  const id = ids[Math.floor(Math.random() * ids.length)];
+  walker.innerHTML = walkerSVG(id);
+  walker.classList.remove("walking");
+  void walker.offsetWidth;
+  walker.classList.add("walking");
+}
+setTimeout(sendWalker, 6000);
+setInterval(sendWalker, 48000);
+
+// ============ データ読み込み（5秒ごと） ============
+let demoMode = false;
+function reloadData() {
+  if (demoMode) return;
+  ["office_status", "office_log"].forEach(f => {
+    const old = document.getElementById("js-" + f);
+    if (old) old.remove();
+    const s = document.createElement("script");
+    s.id = "js-" + f;
+    s.src = `data/${f}.js?t=${Date.now()}`;
+    s.onload = render;
+    document.body.appendChild(s);
+  });
+}
+
+function fmtTime(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return "--:--";
+  return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+}
+
+function render() {
+  const status = window.OFFICE_STATUS || { active: [] };
+  const log = window.OFFICE_LOG || [];
+  const activeDesks = new Map();
+  (status.active || []).forEach(a => {
+    const d = resolveDesk(a.name);
+    if (d) activeDesks.set(d, a.name);
+  });
+
+  document.querySelectorAll(".desk").forEach(el => {
+    el.classList.toggle("active", activeDesks.has(el.id.replace("desk-", "")));
+  });
+
+  const d0 = new Date();
+  const localDate = (t) => `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`;
+  const localToday = localDate(d0);
+  const starts = log.filter(e => e.ev === "start");
+  document.getElementById("stTotal").textContent = starts.length;
+  document.getElementById("stToday").textContent = starts.filter(e => {
+    const t = new Date(e.t);
+    return !isNaN(t) && localDate(t) === localToday;
+  }).length;
+  document.getElementById("stActive").textContent = activeDesks.size;
+
+  // デスクごとの実績（累計・今日・最終出勤）
+  const perDesk = {}, perDeskToday = {}, lastSeen = {};
+  starts.forEach(e => {
+    const d = resolveDesk(e.name);
+    if (!d) return;
+    perDesk[d] = (perDesk[d] || 0) + 1;
+    const t = new Date(e.t);
+    if (!isNaN(t)) {
+      if (localDate(t) === localToday) perDeskToday[d] = (perDeskToday[d] || 0) + 1;
+      if (!lastSeen[d] || t > lastSeen[d]) lastSeen[d] = t;
+    }
+  });
+  document.querySelectorAll(".statcard").forEach(el => {
+    const id = el.id.replace("stat-", "");
+    const br = BREEDS[id];
+    const last = lastSeen[id]
+      ? `${String(lastSeen[id].getHours()).padStart(2,"0")}:${String(lastSeen[id].getMinutes()).padStart(2,"0")}`
+      : "--:--";
+    el.innerHTML = `<b>${br ? br.b : id}</b><br>今日 ${perDeskToday[id] || 0}回 ・ 累計 ${perDesk[id] || 0}回<br>最終出勤 ${last}`;
+  });
+
+  const nowList = document.getElementById("nowList");
+  if (activeDesks.size === 0) {
+    nowList.innerHTML = '<span class="none">全員お昼寝中…💤</span>';
+    document.getElementById("liveState").textContent = "● 待機中";
+    document.getElementById("liveState").style.color = "var(--sub)";
+  } else {
+    nowList.innerHTML = [...activeDesks.values()].map(n => `<div class="on">▶ ${n}</div>`).join("");
+    document.getElementById("liveState").textContent = "● 稼働中";
+    document.getElementById("liveState").style.color = "var(--active)";
+  }
+
+  const logList = document.getElementById("logList");
+  if (log.length) {
+    logList.innerHTML = log.slice(-20).reverse().map(e =>
+      `<div><span class="t">${fmtTime(e.t)}</span><span class="${e.ev === "start" ? "start" : "stop"}">${e.ev === "start" ? "出勤" : "退勤"}</span> ${e.name}</div>`
+    ).join("");
+  }
+}
+
+// ============ 時計 ============
+setInterval(() => {
+  const d = new Date();
+  document.getElementById("clock").textContent =
+    `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")} ` +
+    `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;
+}, 500);
+
+// ============ デモ再生 ============
+document.getElementById("demoBtn").addEventListener("click", () => {
+  demoMode = true;
+  const ids = ROOMS.flatMap(r => r.members.map(m => m.id));
+  const pick = () => ids[Math.floor(Math.random() * ids.length)];
+  const now = () => new Date().toISOString();
+  window.OFFICE_LOG = window.OFFICE_LOG || [];
+  let step = 0;
+  let current = [];
+  const timer = setInterval(() => {
+    step++;
+    const someone = pick();
+    current.push(someone);
+    if (current.length > 3) current.shift();
+    window.OFFICE_LOG.push({ t: now(), name: someone, ev: "start" });
+    window.OFFICE_STATUS = { active: current.map(n => ({ name: n, since: now() })), updated: now() };
+    if (step > 2) window.OFFICE_LOG.push({ t: now(), name: current[0], ev: "stop" });
+    render();
+    if (step >= 7) {
+      clearInterval(timer);
+      window.OFFICE_STATUS = { active: [] };
+      render();
+      demoMode = false;
+    }
+  }, 1500);
+});
+
+reloadData();
+setInterval(reloadData, 5000);
+</script>
+</body>
+</html>
