@@ -7,19 +7,21 @@
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
 <style>
   :root {
-    --panel: #2a2048;
-    --line: #6b58a8;
-    --frame: #3a3560;
-    --gold: #e8c15a;
-    --text: #efe8ff;
-    --sub: #a89ad0;
-    --active: #8affb0;
-    --glass: rgba(160, 190, 255, .35);
+    --panel: #fff6ee;
+    --line: #ffc9d6;
+    --frame: #ffdcb8;
+    --gold: #e8935a;
+    --text: #5a4638;
+    --sub: #b08f8f;
+    --active: #2f9e64;
+    --glass: rgba(255, 190, 210, .55);
+    --pink: #ff6b8a;
+    --mint: #4ecdc4;
     --tilt: 46deg;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: linear-gradient(180deg, #100b24 0%, #1c1240 55%, #2a1a50 100%);
+    background: linear-gradient(180deg, #fdeef5 0%, #fff6e9 45%, #ffe9d6 100%);
     background-attachment: fixed;
     min-height: 100vh;
     color: var(--text);
@@ -30,27 +32,27 @@
     overflow-x: hidden;
   }
   #stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-  #stars span { position: absolute; color: #cdbfff; animation: twinkle 3s infinite; }
-  @keyframes twinkle { 0%,100% { opacity: .15; } 50% { opacity: .9; } }
+  #stars span { position: absolute; color: #ffcf8a; animation: twinkle 3s infinite; }
+  @keyframes twinkle { 0%,100% { opacity: .1; } 50% { opacity: .55; } }
 
   /* ============ アプリ風ウィンドウ ============ */
   .app {
     position: relative; z-index: 1;
     max-width: 1560px; margin: 0 auto;
     border: 3px solid var(--frame); border-radius: 12px;
-    background: #16112e; overflow: hidden;
-    box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 30px rgba(107,88,168,.25);
+    background: #fffaf3; overflow: hidden;
+    box-shadow: 0 12px 40px rgba(255,170,140,.28), 0 0 30px rgba(255,200,160,.3);
   }
   .titlebar {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    padding: 8px 14px; background: #1d1838; border-bottom: 2px solid var(--frame);
+    padding: 8px 14px; background: #fff1e0; border-bottom: 2px solid var(--frame);
   }
   .dots { display: flex; gap: 5px; }
   .dots span { width: 10px; height: 10px; border-radius: 50%; }
   .dots span:nth-child(1) { background: #ff6b6b; }
   .dots span:nth-child(2) { background: #ffd166; }
   .dots span:nth-child(3) { background: #7CFC98; }
-  .titlebar h1 { font-size: 15px; letter-spacing: 1px; color: var(--gold); text-shadow: 0 0 8px rgba(232,193,90,.5); }
+  .titlebar h1 { font-size: 15px; letter-spacing: 1px; color: var(--gold); text-shadow: 0 0 8px rgba(232,147,90,.3); }
   .titlebar .clock { font-size: 12px; color: var(--sub); margin-left: auto; }
   .titlebar .live { font-size: 12px; color: var(--active); }
 
@@ -58,7 +60,7 @@
 
   /* ============ 左ナビ（部屋リスト） ============ */
   .nav {
-    width: 150px; flex: 0 0 150px; background: #1a1533;
+    width: 150px; flex: 0 0 150px; background: #fff6ec;
     border-right: 2px solid var(--frame); padding: 12px 8px; font-size: 11px;
   }
   .nav .navtitle { color: var(--sub); font-size: 10px; margin: 6px 4px; }
@@ -66,7 +68,7 @@
     padding: 4px 8px; cursor: pointer; color: var(--sub); border-radius: 4px;
     display: flex; align-items: center; gap: 6px; margin-bottom: 2px;
   }
-  .nav .item:hover { color: #fff; background: rgba(255,255,255,.07); }
+  .nav .item:hover { color: var(--text); background: rgba(255,140,170,.14); }
   .nav .dot { width: 7px; height: 7px; border-radius: 2px; flex: 0 0 7px; }
   @media (max-width: 1100px) { .nav { display: none; } }
 
@@ -79,25 +81,25 @@
   .zone {
     position: relative; flex: 1 0 auto;
     border: 2px solid var(--glass); border-radius: 6px;
-    background: rgba(34,26,66,.8);
+    background: rgba(255,250,240,.85);
     padding: 24px 6px 8px;
-    box-shadow: inset 0 0 24px rgba(120,90,220,.15), 0 3px 0 rgba(0,0,0,.35);
+    box-shadow: inset 0 0 20px rgba(255,200,160,.2), 0 3px 0 rgba(230,180,150,.35);
     perspective: 820px;
   }
   .zone::before {
     content: ""; position: absolute; top: 0; left: 0; right: 0; height: 11px;
-    background: #4a3a63; border-radius: 4px 4px 0 0; border-bottom: 2px solid #241b3d;
+    background: #ffe3c2; border-radius: 4px 4px 0 0; border-bottom: 2px solid #f0c896;
   }
   .zone h2 {
     position: absolute; top: -3px; left: 8px; z-index: 3;
-    font-size: 11px; padding: 1px 8px; background: #1d1838;
+    font-size: 11px; padding: 1px 8px; background: #fffaf3;
     border: 2px solid; border-radius: 4px; white-space: nowrap;
   }
   .zone .desks {
     display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; align-items: flex-end;
     background-image:
-      linear-gradient(45deg, rgba(255,255,255,.03) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.03) 75%),
-      linear-gradient(45deg, rgba(255,255,255,.03) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.03) 75%);
+      linear-gradient(45deg, rgba(0,0,0,.035) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.035) 75%),
+      linear-gradient(45deg, rgba(0,0,0,.035) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.035) 75%);
     background-size: 22px 22px; background-position: 0 0, 11px 11px;
     border-radius: 4px; padding: 6px 2px 4px; min-height: 100px;
     transform-style: preserve-3d;
@@ -112,7 +114,7 @@
   }
   .room3d::before {
     content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-    border-radius: 4px; background: linear-gradient(0deg, rgba(0,0,0,.32) 0%, transparent 55%);
+    border-radius: 4px; background: linear-gradient(0deg, rgba(120,80,50,.2) 0%, transparent 55%);
   }
   .room3d .deskwall {
     position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 0;
@@ -125,18 +127,18 @@
   .zone.entry { text-align: center; }
   .sign {
     margin: 2px auto 6px; max-width: 250px;
-    background: linear-gradient(180deg, #101a3a, #182552);
-    border: 2px solid #3f5da8; border-radius: 6px; padding: 7px 10px;
-    box-shadow: 0 0 14px rgba(90,140,255,.35), inset 0 0 18px rgba(90,140,255,.15);
+    background: linear-gradient(180deg, #fff3e6, #ffe4cc);
+    border: 2px solid #f2b47a; border-radius: 6px; padding: 7px 10px;
+    box-shadow: 0 0 14px rgba(255,180,120,.35), inset 0 0 18px rgba(255,200,140,.25);
   }
   .sign .signtitle {
-    font-size: 15px; letter-spacing: 2px; color: #9fd8ff;
-    text-shadow: 0 0 10px rgba(120,190,255,.9);
+    font-size: 15px; letter-spacing: 2px; color: var(--gold);
+    text-shadow: 0 0 8px rgba(232,147,90,.4);
   }
-  .sign .signsub { font-size: 10px; color: #6f8fd0; margin-top: 2px; letter-spacing: 1px; }
+  .sign .signsub { font-size: 10px; color: var(--sub); margin-top: 2px; letter-spacing: 1px; }
   .motto {
     margin: 6px auto 2px; font-size: 11px; color: var(--gold);
-    background: rgba(0,0,0,.3); border: 2px solid rgba(232,193,90,.45);
+    background: rgba(255,255,255,.6); border: 2px solid rgba(232,147,90,.4);
     border-radius: 4px; padding: 3px 8px; display: inline-block;
   }
 
@@ -154,7 +156,7 @@
     cursor: pointer; user-select: none;
     transform-style: preserve-3d;
   }
-  .desk:hover { background: rgba(255,255,255,.05); }
+  .desk:hover { background: rgba(255,140,170,.1); }
   .desk .sprite { height: 92px; display: flex; align-items: flex-end; justify-content: center; }
   .desk .dogimg { max-height: 92px; max-width: 100px; object-fit: contain; }
   .desk.active .dogimg { animation: bob 0.8s steps(2) infinite; }
@@ -245,7 +247,7 @@
 
   /* ============ 右サイドバー ============ */
   .sidebar {
-    width: 270px; flex: 0 0 270px; background: #1a1533;
+    width: 270px; flex: 0 0 270px; background: #fff6ec;
     border-left: 2px solid var(--frame); padding: 12px 10px;
     display: flex; flex-direction: column; gap: 12px;
   }
@@ -256,8 +258,8 @@
   }
   .panel h3 { font-size: 12px; color: var(--gold); margin-bottom: 6px; }
   .stats { display: flex; gap: 8px; }
-  .stat { flex: 1; text-align: center; background: rgba(0,0,0,.3); border-radius: 4px; padding: 6px 2px; }
-  .stat .num { font-size: 20px; color: #fff; }
+  .stat { flex: 1; text-align: center; background: rgba(255,140,170,.1); border-radius: 4px; padding: 6px 2px; }
+  .stat .num { font-size: 20px; color: var(--pink); }
   .stat .lbl { font-size: 9px; color: var(--sub); margin-top: 2px; }
   .nowlist { font-size: 11px; line-height: 1.7; }
   .nowlist .none { color: var(--sub); }
@@ -725,13 +727,13 @@ function makeZone(room) {
   const z = document.createElement("section");
   z.className = "zone";
   z.id = "zone-" + room.name;
-  z.style.background = `color-mix(in srgb, ${room.color} 7%, rgba(34,26,66,.85))`;
+  z.style.background = `color-mix(in srgb, ${room.color} 16%, rgba(255,250,240,.9))`;
   z.innerHTML = `<h2 style="border-color:${room.color};color:${room.color}">✦ ${room.name}</h2>`;
   const stage = document.createElement("div");
   stage.className = "room3d";
   const wall = document.createElement("div");
   wall.className = "deskwall";
-  wall.style.background = `linear-gradient(180deg, ${room.color}66, #4a3a63)`;
+  wall.style.background = `linear-gradient(180deg, ${room.color}55, #fff3e2)`;
   stage.appendChild(wall);
   const desks = document.createElement("div");
   desks.className = "desks";
@@ -757,7 +759,7 @@ function makeEntry() {
   const z = document.createElement("section");
   z.className = "zone entry";
   z.id = "zone-受付";
-  z.style.background = `color-mix(in srgb, ${room.color} 8%, rgba(34,26,66,.85))`;
+  z.style.background = `color-mix(in srgb, ${room.color} 18%, rgba(255,250,240,.9))`;
   z.innerHTML = `<h2 style="border-color:${room.color};color:${room.color}">✦ 受付</h2>
     <div class="sign">
       <div class="signtitle">✦ HIMARI COMPANY ✦</div>
@@ -767,7 +769,7 @@ function makeEntry() {
   stage.className = "room3d";
   const wall = document.createElement("div");
   wall.className = "deskwall";
-  wall.style.background = `linear-gradient(180deg, ${room.color}66, #4a3a63)`;
+  wall.style.background = `linear-gradient(180deg, ${room.color}55, #fff3e2)`;
   stage.appendChild(wall);
   const desks = document.createElement("div");
   desks.className = "desks";
@@ -786,10 +788,10 @@ function makeLounge() {
   const z = document.createElement("section");
   z.className = "zone";
   z.id = "zone-休憩ラウンジ";
-  z.style.background = "color-mix(in srgb, #c9a2b8 7%, rgba(34,26,66,.85))";
+  z.style.background = "color-mix(in srgb, #c9a2b8 16%, rgba(255,250,240,.9))";
   z.innerHTML = `<h2 style="border-color:#c9a2b8;color:#e0b8cf">✦ 休憩ラウンジ</h2>
     <div class="room3d">
-      <div class="deskwall" style="background:linear-gradient(180deg, #c9a2b866, #4a3a63)"></div>
+      <div class="deskwall" style="background:linear-gradient(180deg, #c9a2b855, #fff3e2)"></div>
       <div class="lounge-inner">
         <div class="billboard">${pixelSVG(SOFA, 6)}</div>
         <span class="zzz">☕</span>
