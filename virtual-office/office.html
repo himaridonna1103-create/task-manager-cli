@@ -15,6 +15,7 @@
     --sub: #a89ad0;
     --active: #8affb0;
     --glass: rgba(160, 190, 255, .35);
+    --tilt: 46deg;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -81,6 +82,7 @@
     background: rgba(34,26,66,.8);
     padding: 24px 6px 8px;
     box-shadow: inset 0 0 24px rgba(120,90,220,.15), 0 3px 0 rgba(0,0,0,.35);
+    perspective: 820px;
   }
   .zone::before {
     content: ""; position: absolute; top: 0; left: 0; right: 0; height: 11px;
@@ -98,8 +100,26 @@
       linear-gradient(45deg, rgba(255,255,255,.03) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.03) 75%);
     background-size: 22px 22px; background-position: 0 0, 11px 11px;
     border-radius: 4px; padding: 6px 2px 4px; min-height: 100px;
+    transform-style: preserve-3d;
   }
   .zone .plant { position: absolute; bottom: 6px; right: 4px; opacity: .9; pointer-events: none; }
+  .billboard { transform-style: preserve-3d; transform-origin: bottom center; transform: rotateX(calc(-1 * var(--tilt))); }
+
+  /* --- 3Dステージ（床の傾き＋奥の壁） --- */
+  .room3d {
+    position: relative;
+    transform-style: preserve-3d; transform-origin: bottom center; transform: rotateX(var(--tilt));
+  }
+  .room3d::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    border-radius: 4px; background: linear-gradient(0deg, rgba(0,0,0,.32) 0%, transparent 55%);
+  }
+  .room3d .deskwall {
+    position: absolute; top: 0; left: 0; right: 0; height: 32px; z-index: 0;
+    transform-origin: top; transform: rotateX(90deg);
+    border-radius: 4px 4px 0 0;
+    box-shadow: inset 0 -12px 16px rgba(0,0,0,.35), inset 0 3px 0 rgba(255,255,255,.18);
+  }
 
   /* ============ 受付ホール ============ */
   .zone.entry { text-align: center; }
@@ -121,7 +141,10 @@
   }
 
   /* ============ 休憩ラウンジ ============ */
-  .lounge-inner { display: flex; align-items: flex-end; justify-content: center; gap: 10px; padding: 8px 0 4px; }
+  .lounge-inner {
+    display: flex; align-items: flex-end; justify-content: center; gap: 10px; padding: 8px 0 4px;
+    transform-style: preserve-3d;
+  }
   .lounge-inner .zzz { font-size: 14px; animation: floaty 3s ease-in-out infinite; }
 
   /* ============ デスク ============ */
@@ -129,6 +152,7 @@
     width: 100px; text-align: center; position: relative;
     padding: 6px 2px 4px; border: 2px solid transparent; border-radius: 4px;
     cursor: pointer; user-select: none;
+    transform-style: preserve-3d;
   }
   .desk:hover { background: rgba(255,255,255,.05); }
   .desk .sprite { height: 92px; display: flex; align-items: flex-end; justify-content: center; }
@@ -207,7 +231,7 @@
   }
   @keyframes rise { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, -26px); } }
 
-  .prop { display: flex; align-items: flex-end; padding: 0 2px 6px; opacity: .95; }
+  .prop { display: flex; align-items: flex-end; padding: 0 2px 6px; opacity: .95; transform-style: preserve-3d; }
   .prop.floaty svg, .floaty { animation: floaty 3s ease-in-out infinite; }
   @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
@@ -683,14 +707,16 @@ function makeDesk(m) {
   const d = document.createElement("div");
   d.className = "desk";
   d.id = "desk-" + m.id;
-  d.innerHTML = `<span class="badge">おしごと中！</span>
+  d.innerHTML = `<div class="billboard">
+    <span class="badge">おしごと中！</span>
     <span class="workbubble">ｶﾀｶﾀｶﾀ…</span>
     <span class="idlebubble"></span>
     <span class="speech"></span>
     <span class="statcard" id="stat-${m.id}"></span>
     <div class="sprite">${CHAR_IMAGES[m.id] ? `<img class="dogimg" src="${CHAR_IMAGES[m.id]}" alt="${m.label}">` : spriteSVG(m.id)}</div>
     <div class="name">${m.label}</div>
-    <div class="breed">${br ? br.b : ""}</div>`;
+    <div class="breed">${br ? br.b : ""}</div>
+  </div>`;
   d.addEventListener("click", () => react(m.id, d));
   return d;
 }
@@ -701,6 +727,12 @@ function makeZone(room) {
   z.id = "zone-" + room.name;
   z.style.background = `color-mix(in srgb, ${room.color} 7%, rgba(34,26,66,.85))`;
   z.innerHTML = `<h2 style="border-color:${room.color};color:${room.color}">✦ ${room.name}</h2>`;
+  const stage = document.createElement("div");
+  stage.className = "room3d";
+  const wall = document.createElement("div");
+  wall.className = "deskwall";
+  wall.style.background = `linear-gradient(180deg, ${room.color}66, #4a3a63)`;
+  stage.appendChild(wall);
   const desks = document.createElement("div");
   desks.className = "desks";
   room.members.forEach(m => desks.appendChild(makeDesk(m)));
@@ -708,10 +740,11 @@ function makeZone(room) {
   if (prop) {
     const p = document.createElement("div");
     p.className = "prop" + (prop.floaty ? " floaty" : "");
-    p.innerHTML = pixelSVG(prop);
+    p.innerHTML = `<div class="billboard">${pixelSVG(prop)}</div>`;
     desks.appendChild(p);
   }
-  z.appendChild(desks);
+  stage.appendChild(desks);
+  z.appendChild(stage);
   const plant = document.createElement("div");
   plant.className = "plant";
   plant.innerHTML = pixelSVG(PLANT, 4);
@@ -730,11 +763,18 @@ function makeEntry() {
       <div class="signtitle">✦ HIMARI COMPANY ✦</div>
       <div class="signsub">We build. You grow. 📈</div>
     </div>`;
+  const stage = document.createElement("div");
+  stage.className = "room3d";
+  const wall = document.createElement("div");
+  wall.className = "deskwall";
+  wall.style.background = `linear-gradient(180deg, ${room.color}66, #4a3a63)`;
+  stage.appendChild(wall);
   const desks = document.createElement("div");
   desks.className = "desks";
   desks.style.minHeight = "auto";
   room.members.forEach(m => desks.appendChild(makeDesk(m)));
-  z.appendChild(desks);
+  stage.appendChild(desks);
+  z.appendChild(stage);
   const motto = document.createElement("div");
   motto.className = "motto";
   motto.textContent = "「小さく始めて、大きく育てる。」";
@@ -748,11 +788,14 @@ function makeLounge() {
   z.id = "zone-休憩ラウンジ";
   z.style.background = "color-mix(in srgb, #c9a2b8 7%, rgba(34,26,66,.85))";
   z.innerHTML = `<h2 style="border-color:#c9a2b8;color:#e0b8cf">✦ 休憩ラウンジ</h2>
-    <div class="lounge-inner">
-      <div>${pixelSVG(SOFA, 6)}</div>
-      <span class="zzz">☕</span>
-      <div>${pixelSVG(TABLE, 6)}</div>
-      <span class="zzz" style="animation-delay:1.5s">💤</span>
+    <div class="room3d">
+      <div class="deskwall" style="background:linear-gradient(180deg, #c9a2b866, #4a3a63)"></div>
+      <div class="lounge-inner">
+        <div class="billboard">${pixelSVG(SOFA, 6)}</div>
+        <span class="zzz">☕</span>
+        <div class="billboard">${pixelSVG(TABLE, 6)}</div>
+        <span class="zzz" style="animation-delay:1.5s">💤</span>
+      </div>
     </div>`;
   const plant = document.createElement("div");
   plant.className = "plant";
@@ -806,7 +849,7 @@ function react(id, desk) {
   const h = document.createElement("span");
   h.className = "heart";
   h.textContent = "♥";
-  desk.appendChild(h);
+  (desk.querySelector(".billboard") || desk).appendChild(h);
   setTimeout(() => h.remove(), 1000);
 }
 
