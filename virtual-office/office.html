@@ -158,7 +158,8 @@
   }
   .desk:hover { background: rgba(255,140,170,.1); }
   .desk .sprite { height: 92px; display: flex; align-items: flex-end; justify-content: center; }
-  .desk .dogimg { max-height: 92px; max-width: 100px; object-fit: contain; }
+  .dogsvg { filter: drop-shadow(0 1px 2px rgba(74,58,42,.45)); }
+  .desk .dogimg { max-height: 92px; max-width: 100px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(74,58,42,.45)); }
   .desk.active .dogimg { animation: bob 0.8s steps(2) infinite; }
   .desk .name { font-size: 10px; margin-top: 4px; line-height: 1.25; word-break: break-all; }
   .desk .breed { font-size: 10px; color: #8a5a34; margin-top: 2px; font-weight: bold; text-shadow: 0 1px 0 rgba(255,255,255,.6); }
@@ -666,7 +667,7 @@ function spriteSVG(id) {
   const d = dogRects(id, P, offX);
   const deskY = d.rows * P - P * 0.4;
   const pawC = d.br.M || d.br.C;
-  return `<svg width="${W}" height="${deskY + 2.2*P}" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="dogsvg" width="${W}" height="${deskY + 2.2*P}" xmlns="http://www.w3.org/2000/svg">
     <g class="dog">${d.body}<g class="eyes" style="animation-delay:${(hashCode(id)%40)/10}s">${d.eyes}</g></g>
     <rect x="0" y="${deskY}" width="${W}" height="${1.2*P}" fill="#7a5a36"/>
     <rect x="0" y="${deskY+1.2*P}" width="${W}" height="${0.7*P}" fill="#5c4228"/>
@@ -682,7 +683,7 @@ function spriteSVG(id) {
 function walkerSVG(id) {
   const P = 5;
   const d = dogRects(id, P, 0);
-  return `<svg width="${12*P}" height="${d.rows*P}" xmlns="http://www.w3.org/2000/svg">${d.body}${d.eyes}</svg>`;
+  return `<svg class="dogsvg" width="${12*P}" height="${d.rows*P}" xmlns="http://www.w3.org/2000/svg">${d.body}${d.eyes}</svg>`;
 }
 
 function pixelSVG(prop, P) {

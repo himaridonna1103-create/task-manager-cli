@@ -26,6 +26,7 @@
   }
   .pixel { font-family: 'DotGothic16', monospace; }
   .billboard { transform-style: preserve-3d; transform-origin: bottom center; transform: rotateX(calc(-1 * var(--tilt))); }
+  .dogsvg { filter: drop-shadow(0 1px 2px rgba(74,58,42,.45)); }
 
   /* ============ 固定ヘッダー・時刻メーター ============ */
   .brandbar {
@@ -511,7 +512,7 @@ function deskDogSVG(id, P) {
   const offX = P;
   const d = dogRects(id, P, offX);
   const deskY = d.rows * P - P * 0.4;
-  return `<svg width="${W}" height="${deskY + 2*P}" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="dogsvg" width="${W}" height="${deskY + 2*P}" xmlns="http://www.w3.org/2000/svg">
     ${d.body}
     <rect x="0" y="${deskY}" width="${W}" height="${1.2*P}" fill="#7a5a36"/>
     <rect x="0" y="${deskY+1.2*P}" width="${W}" height="${0.6*P}" fill="#5c4228"/>
@@ -521,16 +522,16 @@ function deskDogSVG(id, P) {
 function faceDogSVG(id, P) {
   P = P || 4;
   const d = dogRects(id, P, 0);
-  return `<svg width="${12*P}" height="${d.rows*P}" xmlns="http://www.w3.org/2000/svg">${d.body}</svg>`;
+  return `<svg class="dogsvg" width="${12*P}" height="${d.rows*P}" xmlns="http://www.w3.org/2000/svg">${d.body}</svg>`;
 }
 
 // 画像があれば画像、なければドット絵（CHAR_IMAGES に1行足すだけで差し替わる）
 function charFace(id, P) {
-  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="" style="width:${12*P}px;height:${12*P}px;object-fit:contain">`;
+  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="" style="width:${12*P}px;height:${12*P}px;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(74,58,42,.45))">`;
   return faceDogSVG(id, P);
 }
 function charDesk(id, P) {
-  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="" style="width:${14*P}px;height:${13*P}px;object-fit:contain">`;
+  if (CHAR_IMAGES[id]) return `<img src="${CHAR_IMAGES[id]}" alt="" style="width:${14*P}px;height:${13*P}px;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(74,58,42,.45))">`;
   return deskDogSVG(id, P);
 }
 function sunflowerSVG(P) {
