@@ -14,6 +14,7 @@
     --terra: #b5642e;
     --night: #241a30;
     --nightink: #f0dfb8;
+    --tilt: 28deg;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -24,6 +25,7 @@
     overflow-x: hidden;
   }
   .pixel { font-family: 'DotGothic16', monospace; }
+  .billboard { transform-style: preserve-3d; transform-origin: bottom center; transform: rotateX(calc(-1 * var(--tilt))); }
 
   /* ============ 固定ヘッダー・時刻メーター ============ */
   .brandbar {
@@ -93,12 +95,17 @@
   .broom {
     flex: 1; position: relative; min-height: 96px; border-radius: 5px;
     padding: 6px 4px 0; overflow: hidden;
-    display: flex; align-items: flex-end; justify-content: center; gap: 2px;
     box-shadow: inset 0 0 18px rgba(60,30,10,.35);
+    perspective: 260px;
+  }
+  .broomfloor {
+    position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 6px;
+    display: flex; align-items: flex-end; justify-content: center; gap: 2px;
+    transform-style: preserve-3d; transform-origin: bottom center; transform: rotateX(var(--tilt));
   }
   .broom .rname {
     position: absolute; top: 3px; left: 6px; font-size: 9px;
-    font-family: 'DotGothic16', monospace; opacity: .9;
+    font-family: 'DotGothic16', monospace; opacity: .9; z-index: 2;
   }
   .broom .lampglow {
     position: absolute; top: 0; left: 50%; transform: translateX(-50%);
@@ -155,7 +162,7 @@
 
   /* --- 部署カード --- */
   .dept { max-width: 940px; margin: 0 auto 70px; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 14px 40px rgba(120,90,40,.14); }
-  .scene { position: relative; height: 240px; overflow: hidden; }
+  .scene { position: relative; height: 240px; overflow: hidden; perspective: 560px; }
   .scene .scenefloor { position: absolute; bottom: 0; left: 0; width: 100%; height: 34px; background: #a5713d; }
   .scene .scenefloor::after { content: ""; position: absolute; top: 0; width: 100%; height: 7px; background: rgba(255,255,255,.15); }
   .scene .win {
@@ -170,7 +177,10 @@
     background: linear-gradient(205deg, rgba(255,232,170,.55) 0%, rgba(255,232,170,.16) 45%, transparent 65%);
     animation: lampf 4.5s ease-in-out infinite;
   }
-  .scene .dogsrow { position: absolute; bottom: 22px; left: 0; width: 100%; display: flex; justify-content: center; gap: 26px; align-items: flex-end; }
+  .scene .dogsrow {
+    position: absolute; bottom: 22px; left: 0; width: 100%; display: flex; justify-content: center; gap: 26px; align-items: flex-end;
+    transform-style: preserve-3d; transform-origin: bottom center; transform: rotateX(var(--tilt));
+  }
   .scene .sceneprop { position: absolute; bottom: 30px; left: 26px; }
   .scene .sceneplant { position: absolute; bottom: 30px; right: 26px; }
   .scene img.sceneimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -220,14 +230,17 @@
   }
   .flowpanel.show { display: block; animation: panelin .5s ease; }
   @keyframes panelin { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-  .theater { position: relative; min-height: 440px; padding: 18px 20px 24px; }
+  .theater { position: relative; min-height: 440px; padding: 18px 20px 24px; perspective: 560px; }
   .th-head { display: flex; justify-content: space-between; align-items: flex-start; color: #fdf3e2; gap: 10px; flex-wrap: wrap; }
   .th-phase { font-size: 10px; letter-spacing: 3px; opacity: .9; }
   .th-room { font-size: 17px; font-weight: 700; letter-spacing: 2px; margin-top: 4px; }
   .th-prog { display: flex; gap: 5px; margin-top: 6px; }
   .th-prog span { width: 26px; height: 3px; background: rgba(255,255,255,.28); border-radius: 2px; }
   .th-prog span.on { background: #ffd88a; }
-  .th-dogs { display: flex; justify-content: center; gap: 22px; align-items: flex-end; margin: 20px 0 14px; min-height: 96px; }
+  .th-dogs {
+    display: flex; justify-content: center; gap: 22px; align-items: flex-end; margin: 20px 0 14px; min-height: 96px;
+    transform-style: preserve-3d; transform-origin: bottom center; transform: rotateX(var(--tilt));
+  }
   .th-dogs svg { filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
   .th-card {
     background: rgba(28,19,11,.85); border: 1px solid rgba(255,216,138,.35); border-radius: 12px;
@@ -324,7 +337,7 @@
 
 <script>
 // ================================================================
-//  設定
+//  ★ 物語の設定（ここを書き換えれば、別の業種・別の会社にも使えます）
 // ================================================================
 const STORY = {
   brand: "HIMARI COMPANY",
@@ -348,7 +361,8 @@ const STORY = {
 };
 
 // ================================================================
-//  画像設定
+//  ★ 画像差し替え（後でAI生成画像にできる。書き方は 画像差し替えガイド.md 参照）
+//  画像ファイルを images/ に置いて、ここに1行足すだけ。消せばドット絵に戻る。
 // ================================================================
 // 部屋の情景（部署カードの背景）＋ヒーローの建物
 // 例： "hero": "images/hero.png",  "秘書室": "images/scene/秘書室.png",
@@ -423,7 +437,7 @@ const ROOMS = [
 ];
 
 // ================================================================
-//  犬種ドット絵
+//  犬種ドット絵（office.html と同じ設定）
 // ================================================================
 const ARCHETYPES = {
   pointy: ["DD........DD","DCD......DCD",".CCCCCCCCCC.",".CCCCCCCCCC.",".CCECCCCECC.",".CCCCMMCCCC.",".CCMMMMMMCC.","..CMMNNMMC..","...MMMMMM...","..CCCCCCCC..",".CCCCCCCCCC."],
@@ -547,10 +561,11 @@ if (SCENE_IMAGES["hero"]) {
   const floorsHTML = FLOORS.map(fl => `
     <div class="brow">${fl.rooms.map(nm => {
       const r = roomByName[nm];
-      const dogs = r.members.slice(0, 2).map(m => charDesk(m.id, 5)).join("");
+      const dogs = r.members.slice(0, 2).map(m => `<div class="billboard">${charDesk(m.id, 5)}</div>`).join("");
       return `<div class="broom" style="background:linear-gradient(180deg, ${r.color}33, #5c422899), #6b4f33">
         <span class="rname" style="color:#fdf3d8">${nm}</span>
-        <span class="lampglow"></span>${dogs}</div>`;
+        <span class="lampglow"></span>
+        <div class="broomfloor">${dogs}</div></div>`;
     }).join("")}</div>`).join("");
   buildingHTML = `<div class="building">
       <div class="roof">✦ ${STORY.brand} ✦</div>
@@ -623,7 +638,7 @@ FLOORS.forEach(fl => {
     if (SCENE_IMAGES[nm]) {
       sceneInner = `<img class="sceneimg" src="${SCENE_IMAGES[nm]}" alt="${nm}">`;
     } else {
-      const dogs = r.members.slice(0, 3).map(m => charDesk(m.id, 7)).join("");
+      const dogs = r.members.slice(0, 3).map(m => `<div class="billboard">${charDesk(m.id, 7)}</div>`).join("");
       sceneInner = `
         <div class="win"></div>
         <div class="sunbeam"></div>
@@ -771,7 +786,7 @@ function theaterHTML() {
   let mid = "";
   if (idx < 5) {
     const b = w.beats[idx];
-    const dogs = room.members.slice(0, 4).map(m => charDesk(m.id, 6)).join("");
+    const dogs = room.members.slice(0, 4).map(m => `<div class="billboard">${charDesk(m.id, 6)}</div>`).join("");
     mid = `<div class="th-dogs">${dogs}</div>
       <div class="th-card">
         <div class="th-sp">${charFace(b.id, 3)}<span class="th-name">${b.n}</span><span class="th-tag">${b.tag}</span>${b.badge ? `<span class="th-badge">${b.badge}</span>` : ""}</div>
