@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>バーチャルオープンキャンパス｜〇〇動物専門学校</title>
+<style>
+  :root {
+    --purple: #7C3AED;
+    --blue: #2563EB;
+    --yellow: #FACC15;
+    --green: #22C55E;
+    --pink: #EC4899;
+    --bg: #F4F4F6;
+    --ink: #18181B;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Noto Sans JP", "Hiragino Sans", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  /* ===== シーン全体 ===== */
+  #scene {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ===== 360度パノラマ背景 =====
+     area.photo に360度写真（エクイレクタングラー形式・横:縦=2:1）の
+     パスを入れると実写に切り替わる。null の間は仮背景を自動生成 */
+  #pano {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+    touch-action: none;
+    background: linear-gradient(#c7d2fe, #d6d3d1);
+  }
+  #pano.dragging { cursor: grabbing; }
+  #dragHint {
+    position: absolute;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.9);
+    border: 2px dashed #A1A1AA;
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #52525B;
+    z-index: 15;
+    pointer-events: none;
+    transition: opacity 0.6s;
+  }
+  #dragHint.hide { opacity: 0; }
+
+  /* ===== スマホ調整（スマホ優先方針） ===== */
+  @media (max-width: 600px) {
+    #dialogText { font-size: 14px; }
+    .char { bottom: 215px; }
+    #dog { bottom: 210px; }
+    #areaBadge { font-size: 13px; padding: 8px 16px; }
+    #mapBtn { font-size: 13px; padding: 8px 16px; }
+    #actions { bottom: 200px; flex-direction: column; align-items: center; }
+  }
+
+  /* ===== 上部バー ===== */
+  #topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    z-index: 30;
+  }
+  #areaBadge {
+    background: var(--purple);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+  }
+  #mapBtn {
+    background: #fff;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    box-shadow: 0 3px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  #mapBtn:active { transform: translateY(3px); box-shadow: 0 0 0 var(--ink); }
+
+  /* ===== キャラクター配置 ===== */
+  .char {
+    position: absolute;
+    bottom: 160px;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    z-index: 10;
+  }
+  #guide  { left: 4%;  width: min(150px, 20vw); }
+  #dog    { left: calc(4% + min(140px, 18vw)); width: min(110px, 15vw); bottom: 155px; }
+  #teacher{ right: 4%; width: min(160px, 21vw); opacity: 0; transform: translateX(60px); }
+  #teacher.show { opacity: 1; transform: translateX(0); }
+  .char svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18)); }
+
+  /* しゃべっている人がぴょこっと動く */
+  @keyframes hop {
+    0%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+  }
+  .char.talking svg { animation: hop 0.5s ease; }
+  #teacher.show.talking { transform: translateX(0); }
+
+  /* ===== セリフボックス ===== */
+  #dialog {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    width: min(760px, 92vw);
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    padding: 20px 26px 18px;
+    box-shadow: 0 6px 0 var(--ink);
+    cursor: pointer;
+    z-index: 20;
+    user-select: none;
+  }
+  #speakerName {
+    position: absolute;
+    top: -18px;
+    left: 22px;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 5px 18px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  #speakerName.teacher-tag { background: var(--green); }
+  #speakerName.dog-tag { background: var(--pink); color: #fff; }
+  #dialogText {
+    font-size: 16px;
+    line-height: 1.8;
+    min-height: 3.6em;
+  }
+  #nextHint {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--purple);
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  /* ===== エリア終了時のアクションボタン ===== */
+  #actions {
+    position: absolute;
+    left: 50%;
+    bottom: 150px;
+    transform: translateX(-50%);
+    display: none;
+    gap: 12px;
+    z-index: 25;
+  }
+  #actions.show { display: flex; }
+  .action-btn {
+    background: var(--purple);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    font-family: inherit;
+    padding: 13px 26px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    box-shadow: 0 4px 0 var(--ink);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .action-btn.secondary { background: #fff; color: var(--ink); }
+  .action-btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
+  .action-btn:disabled {
+    background: #D4D4D8; color: #71717A;
+    box-shadow: 0 4px 0 #A1A1AA; border-color: #A1A1AA;
+    cursor: not-allowed;
+  }
+
+  /* ===== マップオーバーレイ ===== */
+  #mapOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(24,24,27,0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  #mapOverlay.show { display: flex; }
+  #mapPanel {
+    background: var(--bg);
+    border-radius: 32px;
+    padding: 30px 34px;
+    width: min(680px, 92vw);
+    max-height: 86vh;
+    overflow-y: auto;
+  }
+  #mapPanel h2 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  #mapPanel .sub { font-size: 13px; color: #52525B; margin-bottom: 18px; }
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+  .map-card {
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s;
+    font-family: inherit;
+    text-align: left;
+  }
+  .map-card:active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
+  .map-card .icon { font-size: 30px; }
+  .map-card .name { font-weight: 700; font-size: 15px; margin-top: 6px; }
+  .map-card .desc { font-size: 12px; color: #52525B; margin-top: 3px; line-height: 1.5; }
+  .map-card.locked {
+    background: #E4E4E7;
+    border-color: #A1A1AA;
+    box-shadow: 0 4px 0 #A1A1AA;
+    cursor: not-allowed;
+    opacity: 0.75;
+  }
+  .map-card.locked .name::after {
+    content: " 準備中";
+    font-size: 11px;
+    color: var(--pink);
+  }
+  #closeMap {
+    margin-top: 20px;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<div id="scene">
+  <!-- 360度パノラマ背景 -->
+  <canvas id="pano"></canvas>
+  <div id="dragHint">🔄 ドラッグで360度見回せます</div>
+
+  <!-- 上部バー -->
+  <div id="topbar">
+    <div id="areaBadge">🏫 エントランス</div>
+    <button id="mapBtn" onclick="openMap()">🗺️ マップ</button>
+  </div>
+
+  <!-- 案内役：学生アバター -->
+  <div class="char" id="guide">
+    <svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">
+      <!-- 髪（後ろ） -->
+      <path d="M28 42 Q26 90 34 100 L86 100 Q94 90 92 42 Z" fill="#6B4A2F"/>
+      <!-- 顔 -->
+      <circle cx="60" cy="46" r="26" fill="#FCD9B8"/>
+      <!-- 前髪 -->
+      <path d="M34 42 Q36 18 60 18 Q84 18 86 42 Q74 34 60 36 Q46 34 34 42 Z" fill="#7C5A3A"/>
+      <!-- 目 -->
+      <circle cx="51" cy="48" r="3" fill="#18181B"/>
+      <circle cx="69" cy="48" r="3" fill="#18181B"/>
+      <!-- 口（にっこり） -->
+      <path d="M54 57 Q60 62 66 57" stroke="#18181B" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- ほっぺ -->
+      <circle cx="45" cy="55" r="4" fill="#F9A8C0" opacity="0.7"/>
+      <circle cx="75" cy="55" r="4" fill="#F9A8C0" opacity="0.7"/>
+      <!-- 体（エプロン姿） -->
+      <path d="M40 74 Q60 68 80 74 L86 118 Q60 124 34 118 Z" fill="#7C3AED"/>
+      <path d="M46 76 Q60 72 74 76 L78 112 Q60 116 42 112 Z" fill="#fff"/>
+      <!-- エプロンポケット -->
+      <rect x="52" y="94" width="16" height="12" rx="3" fill="#7C3AED"/>
+      <!-- 腕（右手を上げて案内ポーズ） -->
+      <path d="M80 78 Q98 70 102 56" stroke="#FCD9B8" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M40 78 Q30 92 32 102" stroke="#FCD9B8" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <!-- 足 -->
+      <rect x="46" y="118" width="10" height="22" rx="5" fill="#3F3F46"/>
+      <rect x="64" y="118" width="10" height="22" rx="5" fill="#3F3F46"/>
+    </svg>
+  </div>
+
+  <!-- 案内役：犬（トイプードル風） -->
+  <div class="char" id="dog">
+    <svg viewBox="0 0 110 100" xmlns="http://www.w3.org/2000/svg">
+      <!-- しっぽ -->
+      <circle cx="16" cy="58" r="10" fill="#E8D3B0"/>
+      <!-- 体 -->
+      <ellipse cx="48" cy="70" rx="30" ry="22" fill="#F0E0C0"/>
+      <!-- もこもこ頭 -->
+      <circle cx="76" cy="38" r="20" fill="#F0E0C0"/>
+      <circle cx="62" cy="28" r="12" fill="#F0E0C0"/>
+      <circle cx="88" cy="26" r="11" fill="#F0E0C0"/>
+      <circle cx="74" cy="20" r="11" fill="#F0E0C0"/>
+      <!-- 耳（垂れ耳もこもこ） -->
+      <ellipse cx="58" cy="44" rx="9" ry="14" fill="#E8D3B0"/>
+      <ellipse cx="94" cy="44" rx="9" ry="14" fill="#E8D3B0"/>
+      <!-- 目 -->
+      <circle cx="70" cy="38" r="3" fill="#18181B"/>
+      <circle cx="83" cy="38" r="3" fill="#18181B"/>
+      <!-- 鼻・口 -->
+      <ellipse cx="76" cy="46" rx="5" ry="4" fill="#3F3F46"/>
+      <path d="M72 52 Q76 55 80 52" stroke="#3F3F46" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- 足 -->
+      <rect x="32" y="84" width="9" height="14" rx="4.5" fill="#E8D3B0"/>
+      <rect x="56" y="84" width="9" height="14" rx="4.5" fill="#E8D3B0"/>
+      <!-- 首輪 -->
+      <path d="M60 54 Q76 62 92 54" stroke="#EC4899" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- 先生（エリアごとに登場） -->
+  <div class="char" id="teacher">
+    <svg viewBox="0 0 120 155" xmlns="http://www.w3.org/2000/svg">
+      <!-- 顔 -->
+      <circle cx="60" cy="42" r="25" fill="#F5CBA7"/>
+      <!-- 髪（短髪） -->
+      <path d="M35 40 Q34 15 60 14 Q86 15 85 40 Q80 26 60 28 Q40 26 35 40 Z" fill="#44403C"/>
+      <!-- メガネ -->
+      <circle cx="50" cy="44" r="8" fill="none" stroke="#18181B" stroke-width="2"/>
+      <circle cx="70" cy="44" r="8" fill="none" stroke="#18181B" stroke-width="2"/>
+      <line x1="58" y1="44" x2="62" y2="44" stroke="#18181B" stroke-width="2"/>
+      <!-- 目 -->
+      <circle cx="50" cy="44" r="2.5" fill="#18181B"/>
+      <circle cx="70" cy="44" r="2.5" fill="#18181B"/>
+      <!-- 口 -->
+      <path d="M54 56 Q60 60 66 56" stroke="#18181B" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- 体（白衣） -->
+      <path d="M38 70 Q60 64 82 70 L90 122 Q60 128 30 122 Z" fill="#fff" stroke="#D4D4D8" stroke-width="2"/>
+      <path d="M60 68 L60 122" stroke="#D4D4D8" stroke-width="2"/>
+      <!-- インナー -->
+      <path d="M52 68 Q60 74 68 68 L66 82 L54 82 Z" fill="#2563EB"/>
+      <!-- 腕（手を振る） -->
+      <path d="M82 74 Q100 64 104 48" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/>
+      <path d="M82 74 Q100 64 104 48" stroke="#F5CBA7" stroke-width="0"/>
+      <circle cx="104" cy="46" r="7" fill="#F5CBA7"/>
+      <path d="M38 74 Q28 90 30 100" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/>
+      <circle cx="30" cy="102" r="6" fill="#F5CBA7"/>
+      <!-- 足 -->
+      <rect x="46" y="122" width="10" height="24" rx="5" fill="#57534E"/>
+      <rect x="64" y="122" width="10" height="24" rx="5" fill="#57534E"/>
+    </svg>
+  </div>
+
+  <!-- セリフボックス -->
+  <div id="dialog" onclick="nextLine()">
+    <div id="speakerName">みお先生</div>
+    <div id="dialogText"></div>
+    <div id="nextHint">▼ クリックで次へ</div>
+  </div>
+
+  <!-- エリア終了時のボタン -->
+  <div id="actions">
+    <button class="action-btn secondary" onclick="openMap()">🗺️ マップを見る</button>
+    <button class="action-btn" id="nextAreaBtn" onclick="goNextArea()">次のエリアへ →</button>
+  </div>
+
+  <!-- マップ -->
+  <div id="mapOverlay">
+    <div id="mapPanel">
+      <h2>🗺️ キャンパスマップ</h2>
+      <div class="sub">見学したい場所を選んでください</div>
+      <div class="map-grid" id="mapGrid"></div>
+      <button class="action-btn secondary" id="closeMap" onclick="closeMap()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// エリアデータ
+// 新しいエリアを追加する時は、この配列にオブジェクトを1つ足すだけ。
+// photo: 実際の写真を使う時にパスを入れる（null ならプレースホルダー表示）
+// ================================================================
+// 方針メモ：
+// - 訪問者の個人情報は一切あずからない（入力フォーム・アクセス解析・Cookie・保存なし）
+// - 順路：エントランス → トリミング → トレーニング → 看護 → 教室（座学）→ 実地OC案内で締める
+// - エリアは1つずつ作って追加していく（lines が空のエリアは「準備中」でロック）
+const AREAS = [
+  {
+    id: "entrance",
+    name: "エントランス",
+    icon: "🏫",
+    desc: "学校の入口。ツアーはここからスタート！",
+    photo: null,
+    unlocked: true,
+    lines: [
+      { speaker: "guide", name: "みお先生", text: "ようこそ、〇〇動物専門学校のバーチャルオープンキャンパスへ！ トリマー担当の「みお先生」です。相棒のマロンと一緒に、校内をご案内しますね♪" },
+      { speaker: "dog", name: "マロン", text: "わんっ！（よろしくね！）" },
+      { speaker: "guide", name: "みお先生", text: "ここは学校のエントランス。毎朝、モデル犬のワンちゃんたちが元気に「登校」してくる、にぎやかな場所なんですよ。" },
+      { speaker: "teacher", name: "田中先生（教務）", text: "こんにちは！ 教務担当の田中です。見学に来てくれてありがとうございます。この学校は「動物が好き」な気持ちを、プロの技術に変える場所です。どうぞゆっくり見ていってくださいね。" },
+      { speaker: "guide", name: "みお先生", text: "それではさっそく、いちばんの見どころ・実習室から見ていきましょう！ 右上のマップから行きたい場所を選ぶこともできますよ。" }
+    ]
+  },
+  // ▼ 新しいエリアはここに追加していく（lines を書けば自動で解放される）
+  { id: "grooming",  name: "トリミング実習室",   icon: "✂️", desc: "プロ仕様の設備で実習",       photo: null, unlocked: false, lines: [] },
+  { id: "training",  name: "トレーニング実習室", icon: "🎾", desc: "しつけ・訓練の実習",         photo: null, unlocked: false, lines: [] },
+  { id: "nursing",   name: "看護実習室",         icon: "🩺", desc: "動物看護の実習",             photo: null, unlocked: false, lines: [] },
+  { id: "classroom", name: "教室（座学）",       icon: "📚", desc: "授業や学べる内容を紹介",     photo: null, unlocked: false, lines: [] },
+  { id: "finale",    name: "実地オープンキャンパス案内", icon: "🌸", desc: "次は本物の学校で会いましょう！", photo: null, unlocked: false, lines: [] }
+];
+
+// ================================================================
+// 360度パノラマビューア（外部ライブラリ不使用・WebGL直書き）
+// 実写に切り替える時：AREAS の photo に 2:1 のエクイレクタングラー
+// 画像パス（例 "photos/entrance.jpg"）を入れるだけ。
+// ================================================================
+const panoCanvas = document.getElementById("pano");
+const gl = panoCanvas.getContext("webgl", { antialias: true });
+let yaw = 0, pitch = 0, autoRotate = true, texReady = false;
+const uni = {};
+
+const VSH = `attribute vec2 aPos; varying vec2 vUV;
+void main(){ vUV = aPos; gl_Position = vec4(aPos, 0.0, 1.0); }`;
+const FSH = `precision mediump float; varying vec2 vUV;
+uniform float uYaw,uPitch,uAspect,uFov; uniform sampler2D uTex;
+void main(){
+  float t = tan(uFov*0.5);
+  vec3 d = normalize(vec3(vUV.x*t*uAspect, vUV.y*t, -1.0));
+  float cp=cos(uPitch), sp=sin(uPitch);
+  d = vec3(d.x, d.y*cp - d.z*sp, d.y*sp + d.z*cp);
+  float cy=cos(uYaw), sy=sin(uYaw);
+  d = vec3(d.x*cy + d.z*sy, d.y, -d.x*sy + d.z*cy);
+  float u = atan(d.x, -d.z)/6.2831853 + 0.5;
+  float v = 0.5 - asin(clamp(d.y,-1.0,1.0))/3.1415927;
+  gl_FragColor = texture2D(uTex, vec2(u,v));
+}`;
+
+function initPano() {
+  if (!gl) return;
+  const sh = (type, src) => {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VSH));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FSH));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, "aPos");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  ["uYaw","uPitch","uAspect","uFov"].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
+  gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+  resizePano();
+  requestAnimationFrame(drawPano);
+}
+
+function setPanoTexture(source) {
+  if (!gl) return;
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  texReady = true;
+}
+
+function resizePano() {
+  if (!gl) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  panoCanvas.width = panoCanvas.clientWidth * dpr;
+  panoCanvas.height = panoCanvas.clientHeight * dpr;
+  gl.viewport(0, 0, panoCanvas.width, panoCanvas.height);
+}
+window.addEventListener("resize", resizePano);
+
+function drawPano() {
+  if (gl && texReady) {
+    if (autoRotate) yaw += 0.0008;
+    gl.uniform1f(uni.uYaw, yaw);
+    gl.uniform1f(uni.uPitch, pitch);
+    gl.uniform1f(uni.uAspect, panoCanvas.width / panoCanvas.height);
+    gl.uniform1f(uni.uFov, (panoCanvas.clientWidth < 600 ? 85 : 72) * Math.PI / 180);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  requestAnimationFrame(drawPano);
+}
+
+// ドラッグ・スワイプで見回す
+let dragging = false, lastX = 0, lastY = 0;
+panoCanvas.addEventListener("pointerdown", e => {
+  dragging = true;
+  autoRotate = false;
+  lastX = e.clientX; lastY = e.clientY;
+  panoCanvas.classList.add("dragging");
+  panoCanvas.setPointerCapture(e.pointerId);
+  document.getElementById("dragHint").classList.add("hide");
+});
+panoCanvas.addEventListener("pointermove", e => {
+  if (!dragging) return;
+  yaw   += (e.clientX - lastX) * 0.0035;
+  pitch += (e.clientY - lastY) * 0.0035;
+  pitch = Math.max(-1.2, Math.min(1.2, pitch));
+  lastX = e.clientX; lastY = e.clientY;
+});
+["pointerup", "pointercancel"].forEach(ev =>
+  panoCanvas.addEventListener(ev, () => {
+    dragging = false;
+    panoCanvas.classList.remove("dragging");
+  })
+);
+
+// 仮背景（360度写真が来るまでのプレースホルダー）を自動生成
+function makePlaceholderPano(area) {
+  const W = 2048, H = 1024;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  const horizon = H * 0.62;
+
+  // 天井〜壁
+  const g = x.createLinearGradient(0, 0, 0, horizon);
+  g.addColorStop(0, "#c7d2fe");
+  g.addColorStop(1, "#eef2ff");
+  x.fillStyle = g;
+  x.fillRect(0, 0, W, horizon);
+
+  // 床
+  const f = x.createLinearGradient(0, horizon, 0, H);
+  f.addColorStop(0, "#e7e5e4");
+  f.addColorStop(1, "#a8a29e");
+  x.fillStyle = f;
+  x.fillRect(0, horizon, W, H - horizon);
+
+  // 巾木ライン
+  x.fillStyle = "rgba(24,24,27,0.2)";
+  x.fillRect(0, horizon - 3, W, 6);
+
+  // 床のパース線（奥行き感）
+  x.strokeStyle = "rgba(24,24,27,0.08)";
+  x.lineWidth = 3;
+  for (let i = 0; i <= 32; i++) {
+    x.beginPath();
+    x.moveTo((W / 32) * i, horizon);
+    x.lineTo((W / 32) * i, H);
+    x.stroke();
+  }
+
+  // 右側に窓
+  x.fillStyle = "#bfdbfe";
+  x.strokeStyle = "#818cf8";
+  x.lineWidth = 6;
+  for (const wx of [W * 0.68, W * 0.80]) {
+    x.fillRect(wx, H * 0.30, W * 0.08, H * 0.24);
+    x.strokeRect(wx, H * 0.30, W * 0.08, H * 0.24);
+  }
+
+  // 左側にドア
+  x.fillStyle = "#ddd6fe";
+  x.strokeStyle = "#7C3AED";
+  x.fillRect(W * 0.22, H * 0.28, W * 0.07, H * 0.34);
+  x.strokeRect(W * 0.22, H * 0.28, W * 0.07, H * 0.34);
+
+  // 前方の案内パネル
+  const label = "📷 ここに「" + area.name + "」の360度写真が入ります";
+  x.font = "bold 44px 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', sans-serif";
+  x.textAlign = "center";
+  x.textBaseline = "middle";
+  const tw = x.measureText(label).width;
+  const px = W / 2, py = H * 0.42, pw = tw + 80, ph = 100;
+  x.fillStyle = "rgba(255,255,255,0.9)";
+  x.strokeStyle = "#A1A1AA";
+  x.lineWidth = 4;
+  x.setLineDash([14, 10]);
+  x.beginPath();
+  if (x.roundRect) x.roundRect(px - pw / 2, py - ph / 2, pw, ph, 30);
+  else x.rect(px - pw / 2, py - ph / 2, pw, ph);
+  x.fill();
+  x.stroke();
+  x.setLineDash([]);
+  x.fillStyle = "#3F3F46";
+  x.fillText(label, px, py);
+
+  // 方角の目印
+  x.font = "bold 34px 'Noto Sans JP', sans-serif";
+  x.fillStyle = "rgba(63,63,70,0.55)";
+  x.fillText("ひだり →", W * 0.25, H * 0.20);
+  x.fillText("← みぎ", W * 0.75, H * 0.20);
+  x.fillText("うしろ", W * 0.03, H * 0.20);
+  x.fillText("うしろ", W * 0.97, H * 0.20);
+
+  return c;
+}
+
+function setPanorama(area) {
+  yaw = 0; pitch = 0; autoRotate = true;
+  if (area.photo) {
+    const img = new Image();
+    img.onload = () => setPanoTexture(img);
+    img.src = area.photo;
+  } else {
+    setPanoTexture(makePlaceholderPano(area));
+  }
+}
+
+// ================================================================
+// ツアー進行ロジック
+// ================================================================
+let currentAreaIndex = 0;
+let currentLineIndex = 0;
+
+const el = {
+  badge: document.getElementById("areaBadge"),
+  speakerName: document.getElementById("speakerName"),
+  dialogText: document.getElementById("dialogText"),
+  dialog: document.getElementById("dialog"),
+  actions: document.getElementById("actions"),
+  nextAreaBtn: document.getElementById("nextAreaBtn"),
+  teacher: document.getElementById("teacher"),
+  guide: document.getElementById("guide"),
+  dog: document.getElementById("dog"),
+  mapOverlay: document.getElementById("mapOverlay"),
+  mapGrid: document.getElementById("mapGrid")
+};
+
+function loadArea(index) {
+  const area = AREAS[index];
+  currentAreaIndex = index;
+  currentLineIndex = 0;
+  el.badge.textContent = `${area.icon} ${area.name}`;
+  setPanorama(area);
+  el.teacher.classList.remove("show");
+  el.actions.classList.remove("show");
+  el.dialog.style.display = "block";
+  showLine();
+}
+
+function showLine() {
+  const area = AREAS[currentAreaIndex];
+  const line = area.lines[currentLineIndex];
+  if (!line) return endArea();
+
+  el.speakerName.textContent = line.name;
+  el.speakerName.className = "";
+  if (line.speaker === "teacher") el.speakerName.classList.add("teacher-tag");
+  if (line.speaker === "dog") el.speakerName.classList.add("dog-tag");
+  el.dialogText.textContent = line.text;
+
+  // 先生のセリフになったら登場させる
+  if (line.speaker === "teacher") el.teacher.classList.add("show");
+
+  // しゃべる人をぴょこっと動かす
+  [el.guide, el.dog, el.teacher].forEach(c => c.classList.remove("talking"));
+  const talker = line.speaker === "guide" ? el.guide : line.speaker === "dog" ? el.dog : el.teacher;
+  talker.classList.add("talking");
+  setTimeout(() => talker.classList.remove("talking"), 500);
+}
+
+function nextLine() {
+  currentLineIndex++;
+  if (currentLineIndex >= AREAS[currentAreaIndex].lines.length) {
+    endArea();
+  } else {
+    showLine();
+  }
+}
+
+function endArea() {
+  el.dialog.style.display = "none";
+  el.actions.classList.add("show");
+  // 次の解放済みエリアがあるかチェック
+  const next = AREAS.slice(currentAreaIndex + 1).find(a => a.unlocked);
+  el.nextAreaBtn.disabled = !next;
+  el.nextAreaBtn.textContent = next ? `${next.name}へ →` : "次のエリアは準備中です";
+}
+
+function goNextArea() {
+  const nextIndex = AREAS.findIndex((a, i) => i > currentAreaIndex && a.unlocked);
+  if (nextIndex !== -1) loadArea(nextIndex);
+}
+
+// ================================================================
+// マップ
+// ================================================================
+function openMap() {
+  el.mapGrid.innerHTML = "";
+  AREAS.forEach((area, i) => {
+    const card = document.createElement("button");
+    card.className = "map-card" + (area.unlocked ? "" : " locked");
+    card.innerHTML = `<div class="icon">${area.icon}</div><div class="name">${area.name}</div><div class="desc">${area.desc}</div>`;
+    if (area.unlocked) {
+      card.onclick = () => { closeMap(); loadArea(i); };
+    } else {
+      card.disabled = true;
+    }
+    el.mapGrid.appendChild(card);
+  });
+  el.mapOverlay.classList.add("show");
+}
+function closeMap() {
+  el.mapOverlay.classList.remove("show");
+}
+
+// スタート
+initPano();
+loadArea(0);
+</script>
+</body>
+</html>
