@@ -846,13 +846,21 @@ const CHAR_IMAGES = {
   sakura: "chars/sakura.png"   // さくら先生（動物看護）
 };
 
-function applyCharImage(elm, path) {
+function applyCharImage(elm, path, charKey) {
   if (!path) return;
   const img = new Image();
   img.alt = "";
-  img.onload = () => { elm.innerHTML = ""; elm.appendChild(img); };
+  img.onload = () => {
+    // 読み込み中に別のキャラへ切り替わっていたら差し替えない（表示乱れ防止）
+    if (charKey && elm.dataset.char !== charKey) return;
+    elm.innerHTML = "";
+    elm.appendChild(img);
+  };
   img.src = path;
 }
+
+// 起動時に全キャラ画像を先読みして、切り替え時のチラつきを抑える
+Object.values(CHAR_IMAGES).forEach(p => { new Image().src = p; });
 
 // ================================================================
 // ツアー進行ロジック
@@ -904,7 +912,7 @@ function showLine() {
     if (el.teacher.dataset.char !== line.char) {
       el.teacher.innerHTML = TEACHER_CHARS[line.char] || "";
       el.teacher.dataset.char = line.char;
-      applyCharImage(el.teacher, CHAR_IMAGES[line.char]);
+      applyCharImage(el.teacher, CHAR_IMAGES[line.char], line.char);
     }
     el.teacher.classList.add("show");
   }
