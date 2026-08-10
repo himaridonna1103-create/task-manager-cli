@@ -112,11 +112,16 @@
     transition: transform 0.4s ease, opacity 0.4s ease;
     z-index: 10;
   }
-  #guide2 { left: 3%; width: min(135px, 17.5vw); }
-  #guide  { left: calc(3% + min(125px, 16vw)); width: min(130px, 17vw); }
-  #dog    { left: calc(3% + min(120px, 15vw) + min(125px, 16vw)); width: min(100px, 13vw); bottom: 155px; }
+  #guide2 { left: 3%; width: min(144px, 18.5vw); }
+  #guide  { left: calc(3% + min(134px, 17vw)); width: min(130px, 17vw); }
+  #dog    { left: calc(3% + min(134px, 17vw) + min(125px, 16vw)); width: min(100px, 13vw); bottom: 155px; }
   #teacher{ right: 4%; width: min(160px, 21vw); opacity: 0; transform: translateX(60px); }
   #teacher.show { opacity: 1; transform: translateX(0); }
+  /* 先生ごとの表示サイズ調整：画像の縦横比の違いを補正し、
+     見た目の身長をさくら先生(476px)基準に統一。男性の先生は約5%大きめ(500px) */
+  #teacher[data-char="mio"]    { width: min(148px, 19.5vw); }
+  #teacher[data-char="tanaka"] { width: min(186px, 24vw); }
+  #teacher[data-char="daichi"] { width: min(204px, 26.5vw); }
   .char svg, .char img { width: 100%; height: auto; display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18)); }
 
   /* 架空キャラクターの明記（誤解防止・常時表示） */
@@ -836,14 +841,16 @@ const TEACHER_CHARS = {
 // キャラだけ自動でイラスト→リアル画像に切り替わる（無ければイラストのまま）
 // 生成方法は「画像生成ガイド.md」を参照
 // ================================================================
+// 画像を差し替えたら CHAR_VER の数字を1つ上げる（ブラウザに古いキャッシュを使わせないため）
+const CHAR_VER = "?v=2";
 const CHAR_IMAGES = {
-  guide:  "chars/akari.png",   // あかり（女子学生・案内役）
-  guide2: "chars/riku.png",    // りく（男子学生・案内役）
-  dog:    "chars/maron.png",   // マロン
-  mio:    "chars/mio.png",     // みお先生（トリマー担当）
-  tanaka: "chars/tanaka.png",  // 田中先生（教務）
-  daichi: "chars/daichi.png",  // 大地先生（トレーニング）
-  sakura: "chars/sakura.png"   // さくら先生（動物看護）
+  guide:  "chars/akari.png" + CHAR_VER,   // あかり（女子学生・案内役）
+  guide2: "chars/riku.png" + CHAR_VER,    // りく（男子学生・案内役）
+  dog:    "chars/maron.png" + CHAR_VER,   // マロン
+  mio:    "chars/mio.png" + CHAR_VER,     // みお先生（トリマー担当）
+  tanaka: "chars/tanaka.png" + CHAR_VER,  // 田中先生（教務）
+  daichi: "chars/daichi.png" + CHAR_VER,  // 大地先生（トレーニング）
+  sakura: "chars/sakura.png" + CHAR_VER   // さくら先生（動物看護）
 };
 
 function applyCharImage(elm, path, charKey) {
