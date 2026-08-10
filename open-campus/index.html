@@ -164,6 +164,10 @@
     z-index: 20;
     user-select: none;
   }
+  #dialog:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+  }
   #speakerName {
     position: absolute;
     top: -18px;
@@ -415,8 +419,8 @@
 
   <div id="aiNote">案内役の学生・先生・犬は架空のキャラクターです（画像はAI生成を含みます）</div>
 
-  <!-- セリフボックス -->
-  <div id="dialog" onclick="nextLine()">
+  <!-- セリフボックス（キーボード操作対応：Tab移動→Enter/Spaceで次へ） -->
+  <div id="dialog" onclick="nextLine()" onkeydown="handleDialogKey(event)" role="button" tabindex="0" aria-label="次へ進む">
     <div id="speakerName">あかり</div>
     <div id="dialogText"></div>
     <div id="nextHint">▼ クリックで次へ</div>
@@ -983,6 +987,14 @@ function nextLine() {
     endArea();
   } else {
     showLine();
+  }
+}
+
+// キーボード操作対応：Enter/Spaceでセリフを送る（Spaceのページスクロールは抑止）
+function handleDialogKey(e) {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    nextLine();
   }
 }
 
