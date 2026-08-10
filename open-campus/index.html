@@ -27,6 +27,7 @@
     position: relative;
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* iOS Safariのツールバー分を除いた実際の可視高さ */
     overflow: hidden;
   }
 
@@ -151,7 +152,7 @@
   #dialog {
     position: absolute;
     left: 50%;
-    bottom: 22px;
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     width: min(760px, 92vw);
     background: #fff;
@@ -195,7 +196,7 @@
   #actions {
     position: absolute;
     left: 50%;
-    bottom: 150px;
+    bottom: calc(150px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     display: none;
     gap: 12px;
