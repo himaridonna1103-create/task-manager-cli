@@ -63,14 +63,6 @@
   #dragHint.hide { opacity: 0; }
 
   /* ===== スマホ調整（スマホ優先方針） ===== */
-  @media (max-width: 600px) {
-    #dialogText { font-size: 14px; }
-    .char { bottom: 215px; }
-    #dog { bottom: 210px; }
-    #areaBadge { font-size: 13px; padding: 8px 16px; }
-    #mapBtn { font-size: 13px; padding: 8px 16px; }
-    #actions { bottom: 200px; flex-direction: column; align-items: center; }
-  }
 
   /* ===== 上部バー ===== */
   #topbar {
@@ -138,12 +130,21 @@
     white-space: nowrap;
   }
 
-  /* しゃべっている人がぴょこっと動く */
+  /* しゃべっている人がぴょこっと動く（写真・イラストどちらにも効かせる） */
   @keyframes hop {
     0%, 100% { transform: translateY(0); }
     30% { transform: translateY(-10px); }
   }
-  .char.talking svg { animation: hop 0.5s ease; }
+  .char.talking svg, .char.talking img { animation: hop 0.5s ease; }
+  /* マロンがしゃべる時は、犬らしく2回弾むジャンプ */
+  @keyframes dogJump {
+    0%, 100% { transform: translateY(0); }
+    18% { transform: translateY(-24px); }
+    40% { transform: translateY(0); }
+    58% { transform: translateY(-14px); }
+    78% { transform: translateY(0); }
+  }
+  #dog.talking svg, #dog.talking img { animation: dogJump 0.7s ease; }
   #teacher.show.talking { transform: translateX(0); }
 
   /* ===== セリフボックス ===== */
@@ -281,6 +282,25 @@
   #closeMap {
     margin-top: 20px;
     width: 100%;
+  }
+
+  /* ===== スマホ調整（スマホ優先方針・必ずCSSの最後に置く） ===== */
+  @media (max-width: 600px) {
+    #dialogText { font-size: 14px; }
+    /* キャラを大きく表示。人物はセリフ3行時に足先ギリギリの高さ
+       （4行時は足先が少し隠れる・許容済み）。
+       マロンだけはセリフボックスに隠れない高さをキープ */
+    .char { bottom: 160px; }
+    #guide2 { left: 2%; width: 26vw; }
+    #guide  { left: calc(2% + 24.5vw); width: 24vw; }
+    #dog    { left: calc(2% + 24.5vw + 22.5vw); width: 18vw; bottom: 182px; }
+    #teacher { width: 27vw; }
+    #teacher[data-char="mio"]    { width: 25vw; }
+    #teacher[data-char="tanaka"] { width: 31.5vw; }
+    #teacher[data-char="daichi"] { width: 34.5vw; }
+    #areaBadge { font-size: 13px; padding: 8px 16px; }
+    #mapBtn { font-size: 13px; padding: 8px 16px; }
+    #actions { bottom: 220px; flex-direction: column; align-items: center; }
   }
 </style>
 </head>
@@ -928,7 +948,7 @@ function showLine() {
   [el.guide, el.guide2, el.dog, el.teacher].forEach(c => c.classList.remove("talking"));
   const talker = { guide: el.guide, guide2: el.guide2, dog: el.dog, teacher: el.teacher }[line.speaker] || el.guide;
   talker.classList.add("talking");
-  setTimeout(() => talker.classList.remove("talking"), 500);
+  setTimeout(() => talker.classList.remove("talking"), 800);
 }
 
 function nextLine() {
