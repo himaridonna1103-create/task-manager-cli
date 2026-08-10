@@ -20,6 +20,17 @@ tasks.json
 # AI agent configs (personal settings)
 .secretary/
 .customer-support-advisor/
+.bizdev-strategist/
+work/bizdev-strategist/
+
+# Legal advisor (契約書は機密情報のため必ず除外)
+.legal-advisor/
+
+# Marketing strategist (マーケデータは機密情報のため除外)
+.marketing-strategist/
+
+# Content creator (コンテンツ戦略は機密情報のため除外)
+.content-creator/
 
 # Personal / business files (non-public)
 work/
@@ -32,3 +43,6 @@ memo.md
 *.skill
 meeting-minutes-skill/
 meeting-minutes-workspace/
+
+# Design consultant (デザイン設定・個人用)
+.design-consultant/
