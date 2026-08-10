@@ -1,0 +1,597 @@
+<style>
+  :root {
+    --paper: #edefe6;
+    --paper-deep: #e1e5d6;
+    --ink: #232019;
+    --ink-soft: #5c574c;
+    --accent: #b24a57;
+    --accent-deep: #7c2e38;
+    --gold: #a97425;
+    --line: rgba(35, 32, 25, 0.16);
+    --line-soft: rgba(35, 32, 25, 0.09);
+    --font-display: Rockwell, "Roboto Slab", Georgia, serif;
+    --font-body: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Arial, sans-serif;
+    --font-mono: Consolas, "SF Mono", "Yu Gothic", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  .lp-root {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.7;
+  }
+
+  .lp-root h1, .lp-root h2, .lp-root h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .lp-root a { color: var(--accent-deep); }
+
+  .rail {
+    position: fixed;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    z-index: 20;
+  }
+
+  .rail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .rail-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+    transition: background 0.25s ease, transform 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .rail-item.active .rail-dot {
+    background: var(--accent);
+    transform: scale(1.3);
+  }
+
+  .rail-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .rail-item.active .rail-label { opacity: 1; color: var(--ink); }
+
+  @media (max-width: 980px) {
+    .rail { display: none; }
+  }
+
+  .panel {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rem 8vw;
+    border-bottom: 0.5px solid var(--line-soft);
+  }
+
+  .panel.alt { background: var(--paper-deep); }
+
+  .panel-inner { max-width: 760px; margin: 0 auto; width: 100%; }
+
+  .panel-inner.wide { max-width: 1020px; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin: 0 0 1.1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lp-root h1 { font-size: clamp(34px, 5vw, 58px); line-height: 1.22; }
+  .lp-root h2 { font-size: clamp(26px, 3.4vw, 38px); line-height: 1.3; }
+
+  .lede {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 1.3rem 0 0;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.6rem;
+    margin-top: 2.2rem;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .meta-row span b { color: var(--ink); font-weight: 400; }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2.4rem;
+    padding: 8px 16px;
+    border: 0.5px solid var(--accent);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--accent-deep);
+    width: fit-content;
+  }
+
+  .status-pill::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .log-list {
+    margin-top: 2.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 0.5px solid var(--line);
+  }
+
+  .log-row {
+    display: grid;
+    grid-template-columns: 92px 1fr auto;
+    align-items: baseline;
+    gap: 1.2rem;
+    padding: 1.15rem 0;
+    border-bottom: 0.5px solid var(--line);
+  }
+
+  .log-row .log-tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  .log-row .log-name {
+    font-size: 17px;
+  }
+
+  .log-row .log-state {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .log-row.done .log-state { color: var(--accent-deep); }
+  .log-row.next .log-name { color: var(--ink-soft); }
+
+  .stage-grid {
+    display: flex;
+    gap: 3.5rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .stage-copy { flex: 1 1 320px; }
+  .stage-mock { flex: 1.3 1 420px; min-width: 0; }
+
+  .stage-copy .lede { margin-top: 1rem; }
+
+  .feature-points {
+    margin-top: 1.6rem;
+    padding-left: 1.1rem;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  .feature-points li { margin-bottom: 0.5rem; }
+
+  .mock-frame {
+    background: #ffffff;
+    border: 0.5px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 var(--line-soft);
+  }
+
+  .mock-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 12px;
+    background: #f4f1ea;
+    border-bottom: 0.5px solid var(--line);
+  }
+
+  .mock-titlebar .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #d8d2c4;
+  }
+
+  .mock-titlebar .url {
+    margin-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: #8a8477;
+  }
+
+  .mock-body { display: flex; min-height: 300px; }
+
+  .mock-sidebar {
+    width: 108px;
+    background: #dceaf6;
+    padding: 14px 10px;
+    flex-shrink: 0;
+    font-family: var(--font-body);
+  }
+
+  .mock-nav-item {
+    font-size: 11px;
+    color: #3a5876;
+    padding: 6px 7px;
+    border-radius: 5px;
+    margin-bottom: 3px;
+  }
+
+  .mock-nav-item.on { background: #ffffff; color: #234a6e; }
+
+  .mock-main { flex: 1; padding: 18px 20px; min-width: 0; }
+
+  .mock-h {
+    font-size: 15px;
+    color: #1c1b18;
+    margin-bottom: 4px;
+  }
+
+  .mock-sub {
+    font-size: 10.5px;
+    color: #857f70;
+    margin-bottom: 14px;
+  }
+
+  .mock-field-label {
+    font-size: 10px;
+    color: #6b6558;
+    margin-bottom: 4px;
+  }
+
+  .mock-field {
+    background: #f4f2ec;
+    border: 0.5px solid #e2ddcf;
+    border-radius: 5px;
+    padding: 8px 9px;
+    font-size: 10.5px;
+    color: #4a463c;
+    margin-bottom: 12px;
+  }
+
+  .mock-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 14px;
+  }
+
+  .mock-btn {
+    background: #4f8fd1;
+    color: #ffffff;
+    text-align: center;
+    padding: 9px;
+    border-radius: 5px;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  .mock-upload {
+    border: 1.5px dashed #c7cfd8;
+    border-radius: 6px;
+    padding: 22px 12px;
+    text-align: center;
+    font-size: 10px;
+    color: #7c8794;
+    background: #fbfcfd;
+    margin-bottom: 8px;
+  }
+
+  .mock-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f0d9de;
+    color: #8a2f42;
+    font-size: 10px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    margin-top: 4px;
+  }
+
+  .mock-caption {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 0.9rem;
+    text-align: right;
+  }
+
+  .closing-track {
+    margin-top: 2.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  .track-step {
+    flex: 1 1 150px;
+    padding: 1.1rem 1.2rem 1.1rem 0;
+    border-top: 2px solid var(--line);
+    position: relative;
+  }
+
+  .track-step.done { border-top-color: var(--accent); }
+
+  .track-step .t-name { font-size: 14.5px; margin-top: 10px; }
+  .track-step .t-state {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+
+  .track-step.done .t-state { color: var(--accent-deep); }
+
+  .closing-note {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 0.5px solid var(--line);
+    font-size: 15px;
+    color: var(--ink-soft);
+    max-width: 52ch;
+  }
+
+  @media (max-width: 700px) {
+    .panel { padding: 5rem 6vw; }
+    .mock-body { flex-direction: column; }
+    .mock-sidebar { width: 100%; display: flex; gap: 8px; overflow-x: auto; }
+    .mock-2col { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rail-dot, .rail-label { transition: none; }
+  }
+</style>
+
+<div class="lp-root">
+
+  <nav class="rail" aria-label="ページ内ナビゲーション">
+    <a class="rail-item" data-target="sec-1" href="#sec-1"><span class="rail-dot"></span><span class="rail-label">はじめに</span></a>
+    <a class="rail-item" data-target="sec-2" href="#sec-2"><span class="rail-dot"></span><span class="rail-label">作り方</span></a>
+    <a class="rail-item" data-target="sec-3" href="#sec-3"><span class="rail-dot"></span><span class="rail-label">Stage01</span></a>
+    <a class="rail-item" data-target="sec-4" href="#sec-4"><span class="rail-dot"></span><span class="rail-label">Stage02</span></a>
+    <a class="rail-item" data-target="sec-5" href="#sec-5"><span class="rail-dot"></span><span class="rail-label">これから</span></a>
+  </nav>
+
+  <main>
+
+    <section class="panel" id="sec-1">
+      <div class="panel-inner">
+        <p class="eyebrow">ELITE 実装記録</p>
+        <h1>「ひまりちゃん」を、<br>作っています。</h1>
+        <p class="lede">動物系専門学校でグルーミングを教えながら、ELITEでAIの使い方を学び始めました。学んだことを、ひとつずつ自分のサロン業務に実装しています。</p>
+        <div class="meta-row">
+          <span>職業　<b>動物系専門学校講師</b></span>
+          <span>担当　<b>グルーミング</b></span>
+          <span>相棒　<b>Claude</b></span>
+        </div>
+        <div class="status-pill">現在 Stage 02 まで実装済み</div>
+      </div>
+    </section>
+
+    <section class="panel alt" id="sec-2">
+      <div class="panel-inner">
+        <p class="eyebrow">作り方のスタンス</p>
+        <h2>完成させてから見せる、じゃなくていい。</h2>
+        <p class="lede">先に大枠だけ作って、ELITEで学んだことをひとつずつ追加していくやり方で進めています。今できることを並べると、こんな感じです。</p>
+        <div class="log-list">
+          <div class="log-row done">
+            <span class="log-tag">BASE</span>
+            <span class="log-name">サロン専用チャット画面をつくる</span>
+            <span class="log-state">完了</span>
+          </div>
+          <div class="log-row done">
+            <span class="log-tag">STAGE 01</span>
+            <span class="log-name">AI秘書：書類作成（メール返信文）</span>
+            <span class="log-state">完了</span>
+          </div>
+          <div class="log-row done">
+            <span class="log-tag">STAGE 02</span>
+            <span class="log-name">SNS投稿文の自動生成</span>
+            <span class="log-state">完了</span>
+          </div>
+          <div class="log-row next">
+            <span class="log-tag">STAGE 03</span>
+            <span class="log-name">カウンセリングメモ・口コミ返信 ほか</span>
+            <span class="log-state">これから</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="sec-3">
+      <div class="panel-inner wide">
+        <p class="eyebrow">Stage 01</p>
+        <div class="stage-grid">
+          <div class="stage-copy">
+            <h2>AI秘書：書類作成</h2>
+            <p class="lede">メールの返信文、お知らせ文、ご案内文の下書きをワンクリックで作れるようにしました。</p>
+            <ul class="feature-points">
+              <li>宛先・相手と伝えたいポイントを入れるだけ</li>
+              <li>丁寧・フォーマルなど、文体・トーンを選べる</li>
+              <li>お礼メール以外の書類にも展開できる作り</li>
+            </ul>
+          </div>
+          <div class="stage-mock">
+            <div class="mock-frame">
+              <div class="mock-titlebar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="url">localhost:8501/書類作成</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-sidebar">
+                  <div class="mock-nav-item">app</div>
+                  <div class="mock-nav-item">SNS投稿</div>
+                  <div class="mock-nav-item">カウンセリング</div>
+                  <div class="mock-nav-item on">書類作成</div>
+                  <div class="mock-nav-item">議事録</div>
+                </div>
+                <div class="mock-main">
+                  <div class="mock-h">書類作成</div>
+                  <div class="mock-sub">メール・お知らせ・ご案内文などの下書きを自動生成します。</div>
+                  <div class="mock-2col">
+                    <div>
+                      <div class="mock-field-label">書類の種類</div>
+                      <div class="mock-field">お礼メール ▾</div>
+                    </div>
+                    <div>
+                      <div class="mock-field-label">文体・トーン</div>
+                      <div class="mock-field">丁寧・フォーマル ▾</div>
+                    </div>
+                  </div>
+                  <div class="mock-field-label">宛先・相手</div>
+                  <div class="mock-field" style="color:#a8a294;">例：田中様（常連のお客様）</div>
+                  <div class="mock-field-label">内容のポイント</div>
+                  <div class="mock-field" style="color:#a8a294; min-height:34px;">例：先日のトリミングのお礼、次回の来店案内</div>
+                  <div class="mock-btn">下書きを生成する</div>
+                </div>
+              </div>
+            </div>
+            <p class="mock-caption">実際の画面（書類作成ページ）を再現</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel alt" id="sec-4">
+      <div class="panel-inner wide">
+        <p class="eyebrow">Stage 02</p>
+        <div class="stage-grid">
+          <div class="stage-copy">
+            <h2>SNS投稿文の自動生成</h2>
+            <p class="lede">施術後の写真をアップロードするだけで、Instagram・Xそれぞれに合った投稿文を自動生成します。</p>
+            <ul class="feature-points">
+              <li>写真は複数枚まとめてアップロード可能</li>
+              <li>犬種・コース内容を入れると精度が上がる</li>
+              <li>「かわいい系」など投稿のトーンを選べる</li>
+            </ul>
+          </div>
+          <div class="stage-mock">
+            <div class="mock-frame">
+              <div class="mock-titlebar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="url">localhost:8501/SNS投稿</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-sidebar">
+                  <div class="mock-nav-item">app</div>
+                  <div class="mock-nav-item on">SNS投稿</div>
+                  <div class="mock-nav-item">カウンセリング</div>
+                  <div class="mock-nav-item">書類作成</div>
+                  <div class="mock-nav-item">議事録</div>
+                </div>
+                <div class="mock-main">
+                  <div class="mock-h">SNS投稿文ジェネレーター</div>
+                  <div class="mock-sub">施術写真をアップロードするだけで投稿文を自動生成します。</div>
+                  <div class="mock-2col">
+                    <div>
+                      <div class="mock-field-label">施術写真</div>
+                      <div class="mock-upload">Upload ／ JPG, PNG</div>
+                    </div>
+                    <div>
+                      <div class="mock-field-label">犬種</div>
+                      <div class="mock-field" style="color:#a8a294;">例）トイプードル</div>
+                      <div class="mock-field-label">投稿のトーン</div>
+                      <div class="mock-field">かわいい系（絵文字多め） ▾</div>
+                      <span class="mock-chip">Instagram ×</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="mock-caption">実際の画面（SNS投稿ページ）を再現</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="sec-5">
+      <div class="panel-inner">
+        <p class="eyebrow">これから</p>
+        <h2>まだ、育てている途中です。</h2>
+        <p class="lede">枠組みはできたので、これからもELITEで学んだことをひとつずつ足していきます。次に加えたいのは、カウンセリングメモの自動生成と、口コミへの返信文づくりです。</p>
+        <div class="closing-track">
+          <div class="track-step done"><span class="log-tag t-name">土台</span><div class="t-state">完了</div></div>
+          <div class="track-step done"><span class="log-tag t-name">AI秘書</span><div class="t-state">完了</div></div>
+          <div class="track-step done"><span class="log-tag t-name">SNS投稿</span><div class="t-state">完了</div></div>
+          <div class="track-step"><span class="log-tag t-name">カウンセリング</span><div class="t-state">次に着手</div></div>
+          <div class="track-step"><span class="log-tag t-name">口コミ返信</span><div class="t-state">構想中</div></div>
+        </div>
+        <p class="closing-note">「完成してから見せる」よりも、「作りながら見せる」を選んでいます。同じくELITEでAIを学び始めた方の、次の一歩のヒントになればうれしいです。</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  (function () {
+    var items = Array.prototype.slice.call(document.querySelectorAll(".rail-item"));
+    if (!items.length) return;
+    var map = {};
+    items.forEach(function (item) {
+      map[item.getAttribute("data-target")] = item;
+    });
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          var link = map[entry.target.id];
+          if (!link) return;
+          if (entry.isIntersecting) {
+            items.forEach(function (i) { i.classList.remove("active"); });
+            link.classList.add("active");
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    document.querySelectorAll("main section").forEach(function (sec) {
+      observer.observe(sec);
+    });
+    items.forEach(function (item) {
+      item.addEventListener("click", function (e) {
+        e.preventDefault();
+        var target = document.getElementById(item.getAttribute("data-target"));
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  })();
+</script>
