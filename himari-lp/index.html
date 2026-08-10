@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ひまり AI Design｜AIで、あなたの仕事をもっとラクに</title>
+  <meta name="description" content="業務の自動化・AIアシスタント構築・アプリ制作・SNSコンテンツ作成・AI研修まで。教えるプロがあなたのペースに合わせて伴走支援。「自分でできた！」までお付き合いします。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#top" class="logo">ひまり <span class="logo-en">AI Design</span></a>
+      <nav class="header-nav" aria-label="メインナビゲーション">
+        <a href="#service">できること</a>
+        <a href="#assistants">AIスタッフ例</a>
+        <a href="#works">実績</a>
+        <a href="#price">料金</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-btns">
+        <a href="#works" class="btn btn-outline btn-sm">実績を見る</a>
+        <a href="#contact" class="btn btn-primary btn-sm">無料で相談する</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- 1. ヒーロー（Yoom型：入力ボックス＋浮遊パーツ＋覗くマスコット） -->
+    <section class="hero">
+      <h1>さあ、めんどうな仕事を<br>AIにおまかせしよう！</h1>
+      <p class="hero-question">どんなお手伝いが必要ですか？</p>
+
+      <a class="ai-input" href="#contact" aria-label="無料相談へ進む">
+        <span class="placeholder">例：SNSの投稿文づくりが追いつかない…</span>
+        <span class="send" aria-hidden="true">→</span>
+      </a>
+
+      <div class="float-left" aria-hidden="true">
+        <span class="float-icon">🐩</span>
+        <span class="float-icon">📋</span>
+        <span class="float-icon">🧾</span>
+        <span class="float-icon">📱</span>
+        <span class="float-icon">💬</span>
+      </div>
+      <div class="float-right" aria-hidden="true">
+        <span class="float-card">📮 SNS投稿を自動で下書き</span>
+        <span class="float-card">🗓️ 予約リマインドを自動送信</span>
+        <span class="float-card">📝 議事録をAIがまとめる</span>
+      </div>
+
+      <div class="hero-mascots" aria-hidden="true">
+        <div class="mascot mascot-yellow"><span class="face">◠‿◠</span></div>
+        <div class="mascot mascot-pink"><span class="face">・ᴗ・</span></div>
+        <div class="mascot mascot-blue"><span class="face">＾ω＾</span></div>
+        <div class="mascot mascot-green"><span class="face">◕‿◕</span></div>
+      </div>
+    </section>
+
+    <!-- 2. できること（パープルブロック：左見出し×右カード） -->
+    <section class="block block-purple" id="service">
+      <div class="block-split">
+        <div class="split-head">
+          <p class="block-tag">SERVICE</p>
+          <h2>All in One<br>AIサポート</h2>
+          <p class="block-lead">業務の自動化・AIアシスタント・アプリ制作・研修まで。お悩みに合わせて、必要なものを必要なぶんだけ組み合わせる、オールインワンの伴走支援です。</p>
+          <a href="#contact" class="btn btn-white">無料で相談する</a>
+        </div>
+        <div class="card-grid split-cards">
+          <div class="service-card">
+            <span class="service-icon bg-yellow">🤖</span>
+            <h3>業務の自動化・効率化</h3>
+            <p>繰り返しの事務作業や連絡業務をAIで自動化します。</p>
+          </div>
+          <div class="service-card">
+            <span class="service-icon bg-pink">💬</span>
+            <h3>専用AIアシスタント</h3>
+            <p>あなたの仕事のやり方を覚えた専用AIを構築します。</p>
+          </div>
+          <div class="service-card">
+            <span class="service-icon bg-blue">📱</span>
+            <h3>SNS・コンテンツ作成</h3>
+            <p>雰囲気に合わせた投稿文・記事を効率よく作ります。</p>
+          </div>
+          <div class="service-card">
+            <span class="service-icon bg-green">📋</span>
+            <h3>書類・資料作成の時短</h3>
+            <p>議事録・報告書・テンプレ整備をぐっと短くします。</p>
+          </div>
+          <div class="service-card">
+            <span class="service-icon bg-purple">🛠️</span>
+            <h3>アプリ・ツール制作</h3>
+            <p>「ほしかった小さなツール」をオーダーメイドで。</p>
+          </div>
+          <div class="service-card">
+            <span class="service-icon bg-yellow">🎓</span>
+            <h3>AI研修・レクチャー</h3>
+            <p>講師経験を活かして、わかりやすくお教えします。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. AIスタッフ例（白背景：横スクロールカード） -->
+    <section class="section section-white" id="assistants">
+      <p class="section-tag tag-purple">AI ASSISTANTS</p>
+      <h2>あなた専用の<span class="marker-yellow">"AIスタッフ"</span>、つくれます。</h2>
+      <p class="staff-note">いまご提案できるAIスタッフは全24役。1役からでも、チームでも。あなたの仕事に合わせてカスタマイズします。</p>
+
+      <div class="staff-group">
+        <h3 class="staff-cat">📋 事務・バックオフィス</h3>
+        <div class="staff-grid">
+          <div class="staff-card"><div class="staff-blob blob-yellow"><span class="face">◠‿◠</span></div><div><h4>秘書AI</h4><p>メール返信の下書き・予定の整理</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-pink"><span class="face">・ᴗ・</span></div><div><h4>議事録係</h4><p>会議メモから議事録とTo-Doを作成</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-blue"><span class="face">＾ω＾</span></div><div><h4>スプレッドシート係</h4><p>関数・集計・データ整形をおまかせ</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-green"><span class="face">◕‿◕</span></div><div><h4>経理アシスタント</h4><p>領収書処理・仕訳や請求書の下書き</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-purple"><span class="face">˶ᵔ ᵕ ᵔ˶</span></div><div><h4>法務チェック係</h4><p>契約書チェック・社内規程の雛形</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-yellow"><span class="face">◔‿◔</span></div><div><h4>採用アシスタント</h4><p>書類選考の整理・面接質問づくり</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-pink"><span class="face">◠‿◠</span></div><div><h4>目標管理コーチ</h4><p>目標設定と週次の振り返りをサポート</p></div></div>
+        </div>
+      </div>
+
+      <div class="staff-group">
+        <h3 class="staff-cat">✏️ 発信・クリエイティブ</h3>
+        <div class="staff-grid">
+          <div class="staff-card"><div class="staff-blob blob-blue"><span class="face">・ᴗ・</span></div><div><h4>コンテンツ制作係</h4><p>ブログ・SNS・メルマガの文章づくり</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-green"><span class="face">＾ω＾</span></div><div><h4>記事制作チーム</h4><p>リサーチから執筆・校正まで一貫対応</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-purple"><span class="face">◕‿◕</span></div><div><h4>原稿チェッカー</h4><p>誤字脱字・ファクトチェックの専門係</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-yellow"><span class="face">˶ᵔ ᵕ ᵔ˶</span></div><div><h4>スライド職人</h4><p>プレゼン資料を構成から仕上げまで</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-pink"><span class="face">◔‿◔</span></div><div><h4>Webデザイン係</h4><p>LP・バナー制作と配色のご提案</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-blue"><span class="face">◠‿◠</span></div><div><h4>画像プロンプト係</h4><p>画像生成AIを使いこなすお手伝い</p></div></div>
+        </div>
+      </div>
+
+      <div class="staff-group">
+        <h3 class="staff-cat">🔍 調査・戦略</h3>
+        <div class="staff-grid">
+          <div class="staff-card"><div class="staff-blob blob-green"><span class="face">・ᴗ・</span></div><div><h4>リサーチャー</h4><p>市場調査・情報収集をレポート化</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-purple"><span class="face">＾ω＾</span></div><div><h4>論文・技術調査係</h4><p>学術論文や技術動向のウォッチ</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-yellow"><span class="face">◕‿◕</span></div><div><h4>新規事業ブレーン</h4><p>市場分析から事業計画書づくりまで</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-pink"><span class="face">˶ᵔ ᵕ ᵔ˶</span></div><div><h4>マーケ参謀</h4><p>SEO・SNS・広告の戦略立案</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-blue"><span class="face">◔‿◔</span></div><div><h4>レポート作成チーム</h4><p>週次報告・提案書・進捗レポート</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-green"><span class="face">◠‿◠</span></div><div><h4>CS改善アドバイザー</h4><p>FAQ整備・お問い合わせの分析</p></div></div>
+        </div>
+      </div>
+
+      <div class="staff-group">
+        <h3 class="staff-cat">🛠️ 開発・専門サポート</h3>
+        <div class="staff-grid">
+          <div class="staff-card"><div class="staff-blob blob-purple"><span class="face">・ᴗ・</span></div><div><h4>開発サポーター</h4><p>コードレビュー・技術選定の相談</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-yellow"><span class="face">＾ω＾</span></div><div><h4>セキュリティ見守り係</h4><p>APIキーや設定の安全チェック</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-pink"><span class="face">◕‿◕</span></div><div><h4>研修プランナー</h4><p>学習計画・研修カリキュラム設計</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-blue"><span class="face">˶ᵔ ᵕ ᵔ˶</span></div><div><h4>サロンアシスタント</h4><p>グルーミングサロン業務まるごと支援</p></div></div>
+          <div class="staff-card"><div class="staff-blob blob-green"><span class="face">◔‿◔</span></div><div><h4>AIチームビルダー</h4><p>あなた専用のAIチームを設計・構築</p></div></div>
+        </div>
+      </div>
+      <div class="cta-pair">
+        <a href="#contact" class="btn btn-primary">無料で相談する</a>
+        <a href="#works" class="btn btn-outline">実績を見る</a>
+      </div>
+    </section>
+
+    <!-- 4. 伴走支援（イエローブロック：左フロー×右見出し） -->
+    <section class="block block-yellow" id="support">
+      <div class="block-split">
+        <div class="flow-col" aria-hidden="true">
+          <span class="flow-chip">💬 お客様からメッセージが届く</span>
+          <span class="flow-arrow">↓</span>
+          <span class="flow-chip">🤖 AIが返信文を下書き</span>
+          <span class="flow-arrow">↓</span>
+          <span class="flow-chip">👀 あなたは確認して送るだけ</span>
+        </div>
+        <div class="split-head">
+          <p class="block-tag tag-on-yellow">SUPPORT</p>
+          <h2>毎回ぜんぶ自分でやる必要は、ありません。</h2>
+          <p class="block-lead-dark">一度仕組みを作れば、あとはAIが下書きや繰り返し作業を担当。導入して終わりにせず、「自分でできた！」になるまで伴走します。</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-card">
+          <span class="step-num">1</span>
+          <h3>ヒアリング</h3>
+          <p>お仕事の流れを伺って、効果が出やすいところから決めます。</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">2</span>
+          <h3>設定・導入</h3>
+          <p>AIツールの設定はこちらで実施。難しい作業はおまかせください。</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">3</span>
+          <h3>レクチャー</h3>
+          <p>Zoomや訪問で使い方を練習。パソコンが苦手でも大丈夫です。</p>
+        </div>
+        <div class="step-card">
+          <span class="step-num">4</span>
+          <h3>継続サポート</h3>
+          <p>月額サポートで質問対応・改善・アップデートを続けます。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 実績（白背景） -->
+    <section class="section section-white" id="works">
+      <p class="section-tag tag-blue">WORKS</p>
+      <h2>実際に<span class="marker-yellow">作って、使って、検証</span>しています</h2>
+      <div class="card-grid card-grid-2">
+        <a class="work-card border-pink" href="https://himaridonna1103-create.github.io/task-manager-cli/tango.html" target="_blank" rel="noopener">
+          <h3>tango. <span class="work-arrow">↗</span></h3>
+          <p class="work-type">英単語学習アプリ（公開中）</p>
+          <p>専門学校の授業向けに開発した学習アプリ。実際の授業で使われています。</p>
+        </a>
+        <div class="work-card border-purple">
+          <h3>グルーミングアシスタント</h3>
+          <p class="work-type">業務支援AIアシスタント</p>
+          <p>カルテ・引き継ぎメモ・SNS投稿など7機能を備えた専用AI。実際のサロンで検証中です。</p>
+        </div>
+        <a class="work-card border-green" href="https://note.com/ample_sloth9374/m/m5d8ff8faf107" target="_blank" rel="noopener">
+          <h3>note連載 <span class="work-arrow">↗</span></h3>
+          <p class="work-type">AI活用の解説記事</p>
+          <p>現場目線でAI活用を解説する連載記事を公開。「むずかしくないAI」を発信しています。</p>
+        </a>
+        <div class="work-card border-blue">
+          <h3>バーチャルオフィス</h3>
+          <p class="work-type">業務ダッシュボード</p>
+          <p>作業状況をドット絵オフィスで見える化する自作ダッシュボード。遊び心も大切に。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. なぜひまり？（ブルーブロック） -->
+    <section class="block block-blue" id="why">
+      <p class="block-tag">WHY HIMARI?</p>
+      <h2>「教えるプロ」だから、<br>ちゃんと使えるようになります。</h2>
+      <p class="block-lead">ITの専門用語ではなく、あなたの仕事の言葉でお話しします。</p>
+      <div class="card-grid card-grid-3">
+        <div class="why-card">
+          <span class="why-icon">🎓</span>
+          <h3>専門学校の現役講師</h3>
+          <p>「わかるまで教える」が本業。初めての方がつまずくポイントを知っています。</p>
+        </div>
+        <div class="why-card">
+          <span class="why-icon">🏪</span>
+          <h3>現場を知っている</h3>
+          <p>動物業界の実務経験があり、小さなお店・現場のリアルな忙しさを理解しています。</p>
+        </div>
+        <div class="why-card">
+          <span class="why-icon">🤖</span>
+          <h3>AIを毎日使う実践者</h3>
+          <p>自分の業務で毎日AIを使い、効果を確認したものだけをご提案します。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. 料金（グリーンブロック） -->
+    <section class="block block-green" id="price">
+      <p class="block-tag tag-on-green">PRICE</p>
+      <h2>料金プラン</h2>
+      <p class="block-lead-dark">お仕事の内容とお悩みに合わせてお見積りします。まずはお気軽にご相談ください。</p>
+      <div class="card-grid card-grid-2 price-grid">
+        <div class="price-card">
+          <h3>初期設定サポート</h3>
+          <p class="price-amount">お見積り</p>
+          <ul>
+            <li>お仕事・お悩みのヒアリング</li>
+            <li>AIツールの選定・設定</li>
+            <li>使い方レクチャー</li>
+          </ul>
+        </div>
+        <div class="price-card">
+          <h3>月額伴走サポート</h3>
+          <p class="price-amount">お見積り</p>
+          <ul>
+            <li>質問・相談への対応</li>
+            <li>仕組みの改善・追加</li>
+            <li>新しいAI活用のご提案</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. FAQ -->
+    <section class="section section-white" id="faq">
+      <p class="section-tag tag-purple">FAQ</p>
+      <h2>よくあるご質問</h2>
+      <div class="faq-list">
+        <details>
+          <summary>パソコンが苦手でも大丈夫ですか？</summary>
+          <p>大丈夫です。設定はこちらで行い、使い方は「自分でできた！」になるまで練習にお付き合いします。スマホだけでの運用のご相談も可能です。</p>
+        </details>
+        <details>
+          <summary>どんな業種・お仕事に対応できますか？</summary>
+          <p>小規模のお店・個人事業・企業のチームまで幅広くご相談いただけます。特に動物業界（サロン・病院・ショップ）は実務経験があり得意分野です。</p>
+        </details>
+        <details>
+          <summary>何から相談すればいいかわからないのですが…</summary>
+          <p>「なんとなく大変」の状態で大丈夫です。ヒアリングでお仕事の流れを伺いながら、効果が出やすいところを一緒に見つけます。</p>
+        </details>
+        <details>
+          <summary>遠方でも対応できますか？</summary>
+          <p>Zoomとチャットでのオンラインサポートに対応しています。地域によっては訪問サポートもご相談ください。</p>
+        </details>
+        <details>
+          <summary>相談だけでも料金はかかりますか？</summary>
+          <p>初回のご相談は無料です。お話を伺ったうえで、必要なサポート内容とお見積りをご提案します。</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- 9. 最終CTA（パープル） -->
+    <section class="final-cta" id="contact">
+      <h2>あなたの仕事の「めんどう」、<br class="sp-only">聞かせてください。</h2>
+      <p>初回相談は無料です。「うちの場合はどうなる？」から、お気軽にどうぞ。</p>
+      <a href="mailto:himari.donna.1103@gmail.com?subject=%E3%80%90%E7%84%A1%E6%96%99%E7%9B%B8%E8%AB%87%E3%80%91AI%E6%B4%BB%E7%94%A8%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6" class="btn btn-white">無料で相談する</a>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-logo">ひまり <span class="logo-en">AI Design</span></p>
+    <p class="footer-copy">AIで「めんどうな仕事」をラクにする伴走支援。教えるプロが、できるまでお付き合いします。</p>
+    <small>&copy; 2026 ひまり AI Design</small>
+  </footer>
+
+</body>
+</html>
