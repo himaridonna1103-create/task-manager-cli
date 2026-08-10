@@ -112,8 +112,9 @@
     transition: transform 0.4s ease, opacity 0.4s ease;
     z-index: 10;
   }
-  #guide  { left: 4%;  width: min(150px, 20vw); }
-  #dog    { left: calc(4% + min(140px, 18vw)); width: min(110px, 15vw); bottom: 155px; }
+  #guide2 { left: 3%; width: min(135px, 17.5vw); }
+  #guide  { left: calc(3% + min(125px, 16vw)); width: min(130px, 17vw); }
+  #dog    { left: calc(3% + min(120px, 15vw) + min(125px, 16vw)); width: min(100px, 13vw); bottom: 155px; }
   #teacher{ right: 4%; width: min(160px, 21vw); opacity: 0; transform: translateX(60px); }
   #teacher.show { opacity: 1; transform: translateX(0); }
   .char svg, .char img { width: 100%; height: auto; display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18)); }
@@ -169,6 +170,7 @@
   }
   #speakerName.teacher-tag { background: var(--green); }
   #speakerName.dog-tag { background: var(--pink); color: #fff; }
+  #speakerName.guide2-tag { background: var(--blue); color: #fff; }
   #dialogText {
     font-size: 16px;
     line-height: 1.8;
@@ -290,15 +292,17 @@
     <button id="mapBtn" onclick="openMap()">🗺️ マップ</button>
   </div>
 
-  <!-- 案内役：学生アバター -->
+  <!-- 案内役：あかり（女子学生・ラベンダースクラブ） -->
   <div class="char" id="guide">
     <svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">
-      <!-- 髪（後ろ） -->
-      <path d="M28 42 Q26 90 34 100 L86 100 Q94 90 92 42 Z" fill="#6B4A2F"/>
+      <!-- 髪（後ろ・ポニーテール） -->
+      <path d="M30 42 Q28 72 36 82 L84 82 Q92 72 90 42 Z" fill="#3F3026"/>
+      <ellipse cx="96" cy="58" rx="8" ry="17" fill="#3F3026"/>
+      <circle cx="97" cy="42" r="4" fill="#F9A8C0"/>
       <!-- 顔 -->
       <circle cx="60" cy="46" r="26" fill="#FCD9B8"/>
       <!-- 前髪 -->
-      <path d="M34 42 Q36 18 60 18 Q84 18 86 42 Q74 34 60 36 Q46 34 34 42 Z" fill="#7C5A3A"/>
+      <path d="M34 42 Q36 18 60 18 Q84 18 86 42 Q74 34 60 36 Q46 34 34 42 Z" fill="#4A3B2E"/>
       <!-- 目 -->
       <circle cx="51" cy="48" r="3" fill="#18181B"/>
       <circle cx="69" cy="48" r="3" fill="#18181B"/>
@@ -307,25 +311,51 @@
       <!-- ほっぺ -->
       <circle cx="45" cy="55" r="4" fill="#F9A8C0" opacity="0.7"/>
       <circle cx="75" cy="55" r="4" fill="#F9A8C0" opacity="0.7"/>
-      <!-- 体（エプロン姿） -->
-      <path d="M40 74 Q60 68 80 74 L86 118 Q60 124 34 118 Z" fill="#7C3AED"/>
-      <path d="M46 76 Q60 72 74 76 L78 112 Q60 116 42 112 Z" fill="#fff"/>
-      <!-- エプロンポケット（トリマーの証・ハサミ入り） -->
-      <line x1="56" y1="95" x2="62" y2="85" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="62" y1="95" x2="56" y2="85" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="62" cy="85" r="2.5" fill="none" stroke="#94A3B8" stroke-width="1.8"/>
-      <circle cx="56" cy="85" r="2.5" fill="none" stroke="#CBD5E1" stroke-width="1.8"/>
-      <rect x="52" y="94" width="16" height="12" rx="3" fill="#7C3AED"/>
+      <!-- スクラブ上衣（ラベンダー・Vネック） -->
+      <path d="M40 74 Q60 68 80 74 L84 114 Q60 120 36 114 Z" fill="#A78BFA"/>
+      <path d="M52 73 L60 82 L68 73" stroke="#7C3AED" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <rect x="63" y="88" width="12" height="10" rx="2" fill="#8B5CF6"/>
       <!-- 腕（右手を上げて案内ポーズ） -->
       <path d="M80 78 Q98 70 102 56" stroke="#FCD9B8" stroke-width="9" fill="none" stroke-linecap="round"/>
       <path d="M40 78 Q30 92 32 102" stroke="#FCD9B8" stroke-width="9" fill="none" stroke-linecap="round"/>
-      <!-- 足 -->
-      <rect x="46" y="118" width="10" height="22" rx="5" fill="#3F3F46"/>
-      <rect x="64" y="118" width="10" height="22" rx="5" fill="#3F3F46"/>
+      <!-- スクラブパンツ -->
+      <rect x="44" y="112" width="12" height="28" rx="5" fill="#8B5CF6"/>
+      <rect x="62" y="112" width="12" height="28" rx="5" fill="#8B5CF6"/>
+      <!-- スニーカー -->
+      <ellipse cx="50" cy="142" rx="8" ry="4" fill="#fff" stroke="#D4D4D8" stroke-width="1.5"/>
+      <ellipse cx="68" cy="142" rx="8" ry="4" fill="#fff" stroke="#D4D4D8" stroke-width="1.5"/>
     </svg>
   </div>
 
-  <!-- 案内役：犬（トイプードル風） -->
+  <!-- 案内役：りく（男子学生・ラベンダースクラブ） -->
+  <div class="char" id="guide2">
+    <svg viewBox="0 0 120 152" xmlns="http://www.w3.org/2000/svg">
+      <!-- 顔 -->
+      <circle cx="60" cy="44" r="25" fill="#F5CBA7"/>
+      <!-- 短髪 -->
+      <path d="M36 42 Q34 14 60 14 Q86 14 84 42 Q78 24 60 26 Q42 24 36 42 Z" fill="#26211C"/>
+      <!-- 目 -->
+      <circle cx="51" cy="46" r="3" fill="#18181B"/>
+      <circle cx="69" cy="46" r="3" fill="#18181B"/>
+      <!-- 口（にっと笑顔） -->
+      <path d="M53 55 Q60 61 67 55" stroke="#18181B" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- スクラブ上衣（ラベンダー・Vネック） -->
+      <path d="M38 70 Q60 64 82 70 L86 114 Q60 120 34 114 Z" fill="#A78BFA"/>
+      <path d="M52 69 L60 78 L68 69" stroke="#7C3AED" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <rect x="45" y="84" width="12" height="10" rx="2" fill="#8B5CF6"/>
+      <!-- 腕（左手を上げて挨拶・あかりと逆側） -->
+      <path d="M40 74 Q22 66 18 52" stroke="#F5CBA7" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M80 74 Q90 90 88 100" stroke="#F5CBA7" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <!-- スクラブパンツ -->
+      <rect x="44" y="112" width="12" height="30" rx="5" fill="#8B5CF6"/>
+      <rect x="62" y="112" width="12" height="30" rx="5" fill="#8B5CF6"/>
+      <!-- スニーカー -->
+      <ellipse cx="50" cy="144" rx="8" ry="4" fill="#fff" stroke="#D4D4D8" stroke-width="1.5"/>
+      <ellipse cx="68" cy="144" rx="8" ry="4" fill="#fff" stroke="#D4D4D8" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- 案内役：犬（白いビションフリーゼ。画像未配置時の予備イラスト） -->
   <div class="char" id="dog">
     <svg viewBox="0 0 110 100" xmlns="http://www.w3.org/2000/svg">
       <!-- しっぽ -->
@@ -357,11 +387,11 @@
   <!-- 先生（エリアごとに登場。見た目はJSのTEACHER_CHARSからキャラ別に注入） -->
   <div class="char" id="teacher"></div>
 
-  <div id="aiNote">案内役の先生・犬は架空のキャラクターです（画像はAI生成を含みます）</div>
+  <div id="aiNote">案内役の学生・先生・犬は架空のキャラクターです（画像はAI生成を含みます）</div>
 
   <!-- セリフボックス -->
   <div id="dialog" onclick="nextLine()">
-    <div id="speakerName">みお先生</div>
+    <div id="speakerName">あかり</div>
     <div id="dialogText"></div>
     <div id="nextHint">▼ クリックで次へ</div>
   </div>
@@ -402,11 +432,12 @@ const AREAS = [
     photo: "photos/entrance.jpg",
     unlocked: true,
     lines: [
-      { speaker: "guide", name: "みお先生", text: "ようこそ、〇〇動物専門学校のバーチャルオープンキャンパスへ！ トリマー担当の「みお先生」です。相棒のマロンと一緒に、校内をご案内しますね♪" },
+      { speaker: "guide", name: "あかり", text: "ようこそ、〇〇動物専門学校のバーチャルオープンキャンパスへ！ 在校生のあかりです。今日は私たちが校内をご案内します♪" },
+      { speaker: "guide2", name: "りく", text: "同じく在校生のりくです！ で、このふわふわの子が、学校のアイドル犬・マロン。よろしくね！" },
       { speaker: "dog", name: "マロン", text: "わんっ！（よろしくね！）" },
-      { speaker: "guide", name: "みお先生", text: "ここは学校のエントランス。毎朝、モデル犬のワンちゃんたちが元気に「登校」してくる、にぎやかな場所なんですよ。" },
+      { speaker: "guide", name: "あかり", text: "ここは学校のエントランス。毎朝、モデル犬のワンちゃんたちが元気に「登校」してくる、にぎやかな場所なんですよ。" },
       { speaker: "teacher", char: "tanaka", name: "田中先生（教務）", text: "こんにちは！ 教務担当の田中です。見学に来てくれてありがとうございます。この学校は「動物が好き」な気持ちを、プロの技術に変える場所です。どうぞゆっくり見ていってくださいね。" },
-      { speaker: "guide", name: "みお先生", text: "それではさっそく、いちばんの見どころ・実習室から見ていきましょう！ 右上のマップから行きたい場所を選ぶこともできますよ。" }
+      { speaker: "guide2", name: "りく", text: "それではさっそく、いちばんの見どころ・実習室から行きましょう！ 右上のマップから好きな場所を選ぶこともできますよ。" }
     ]
   },
   // ▼ 新しいエリアはここに追加していく（lines を書けば自動で解放される）
@@ -418,12 +449,12 @@ const AREAS = [
     photo: "photos/grooming.jpg",
     unlocked: true,
     lines: [
-      { speaker: "guide", name: "みお先生", text: "ここが私の担当、トリミング実習室です！ プロのサロンと同じトリミングテーブルやシャンプー台、ドライヤーがずらりと並んでいるんですよ。" },
-      { speaker: "dog", name: "マロン", text: "わん♪（ぼく、ここでカットしてもらうの大好き！）" },
-      { speaker: "guide", name: "みお先生", text: "ふふ、マロンはモデル犬の大先輩なんです。授業ではモデル犬たちと一緒に、シャンプーからカットまで、実際に手を動かしながら技術を身につけていきます。" },
-      { speaker: "guide", name: "みお先生", text: "あら、マロンったらもうテーブルの上でスタンバイ？ …それでは特別に、ふんわり仕上げにしてあげますね✂️" },
+      { speaker: "guide", name: "あかり", text: "まずはトリミング実習室！ プロのサロンと同じトリミングテーブルやシャンプー台、ドライヤーがずらっと並んでいます。あ、みお先生！" },
+      { speaker: "teacher", char: "mio", name: "みお先生（トリマー担当）", text: "こんにちは、トリマー担当のみおです♪ ここでは、モデル犬たちと一緒にシャンプーからカットまで、実際に手を動かしながら技術を身につけていきますよ。" },
+      { speaker: "dog", name: "マロン", text: "わん♪（わたし、ここでカットしてもらうの大好き！）" },
+      { speaker: "teacher", char: "mio", name: "みお先生（トリマー担当）", text: "あら、マロンったらもうテーブルの上でスタンバイ？ …それでは特別に、ふんわり仕上げにしてあげますね✂️" },
       { speaker: "dog", name: "マロン", text: "わふ〜ん♪（ふわふわになった〜！）" },
-      { speaker: "guide", name: "みお先生", text: "在学中にトリマーの資格取得を目指せて、卒業後はサロンや動物病院など進路もさまざま。詳しい話は、ぜひ実地のオープンキャンパスで聞いてくださいね！" }
+      { speaker: "guide2", name: "りく", text: "在学中にトリマーの資格取得も目指せて、卒業後はサロンや動物病院など進路もいろいろ。詳しい話は、ぜひ実地のオープンキャンパスで聞いてください！" }
     ]
   },
   {
@@ -434,14 +465,14 @@ const AREAS = [
     photo: "photos/training.jpg",
     unlocked: true,
     lines: [
-      { speaker: "guide", name: "みお先生", text: "続いては、トレーニング実習室です！ 担当は…あ、大地先生、こんにちは！" },
+      { speaker: "guide2", name: "りく", text: "次は、ぼくのいちばん好きな授業・トレーニング実習室です！ 大地先生、こんにちは！" },
       { speaker: "teacher", char: "daichi", name: "大地先生（トレーニング担当）", text: "おう、よく来たな！ トレーニング担当の大地だ。ここでは「おすわり」「マテ」の基本のしつけから、障害物コースを駆け抜けるアジリティまで、犬と一緒に体を動かして学ぶぞ！" },
       { speaker: "teacher", char: "daichi", name: "大地先生（トレーニング担当）", text: "よし、ここでクイズだ！ 犬がしっぽをブンブン振っている時の気持ちは？ …①うれしい ②緊張していることもある。どっちだと思う？" },
-      { speaker: "guide", name: "みお先生", text: "正解は…実は②のこともあるんです！ しっぽの高さや振り方で、気持ちは全然違います。そんな「犬の気持ちの読み方」も、授業でしっかり学びますよ📖" },
-      { speaker: "dog", name: "マロン", text: "わんっ！（ぼくにも合図出して出して！）" },
+      { speaker: "guide", name: "あかり", text: "正解は…実は②のこともあるんです！ しっぽの高さや振り方で、気持ちは全然違うんですよ。そんな「犬の気持ちの読み方」も、授業でしっかり学びます📖" },
+      { speaker: "dog", name: "マロン", text: "わんっ！（わたしにも合図出して出して！）" },
       { speaker: "teacher", char: "daichi", name: "大地先生（トレーニング担当）", text: "お、マロンはやる気満々だな。よーし……ハイタッチ！" },
       { speaker: "dog", name: "マロン", text: "わん♪（ぱちーん！）" },
-      { speaker: "guide", name: "みお先生", text: "できました〜！ マロンのこの技も、ここの授業で覚えたんですよ。犬と気持ちが通じる瞬間は、ぜひ実地のオープンキャンパスで体験してくださいね！" }
+      { speaker: "guide", name: "あかり", text: "できました〜！ マロンのこの技も、ここの授業で覚えたんですよ。犬と気持ちが通じる瞬間は、ぜひ実地のオープンキャンパスで体験してくださいね！" }
     ]
   },
   {
@@ -452,12 +483,12 @@ const AREAS = [
     photo: "photos/nursing.jpg",
     unlocked: true,
     lines: [
-      { speaker: "guide", name: "みお先生", text: "次は看護実習室です。ここでは、動物たちの健康を守るための勉強をしています。あ、さくら先生！" },
+      { speaker: "guide", name: "あかり", text: "次は看護実習室です。ここでは、動物たちの健康を守るための勉強をしています。あ、さくら先生！" },
       { speaker: "teacher", char: "sakura", name: "さくら先生（動物看護担当）", text: "こんにちは、動物看護担当のさくらです♪ ここでは聴診器での心音チェックや体重測定など、動物たちの毎日の健康チェックを実習で学びます。" },
       { speaker: "teacher", char: "sakura", name: "さくら先生（動物看護担当）", text: "顕微鏡や処置台など、動物病院と同じような機器もそろっているんですよ。それでは…マロンちゃん、今日も健康診断してみようか♪" },
       { speaker: "dog", name: "マロン", text: "わん…（ドキドキ…でもさくら先生は優しいから平気！）" },
       { speaker: "teacher", char: "sakura", name: "さくら先生（動物看護担当）", text: "うんうん、心臓の音もとってもきれい。マロンちゃん、今日も元気いっぱいです◎" },
-      { speaker: "guide", name: "みお先生", text: "ここでの学びは、国家資格「愛玩動物看護師」を目指す道にもつながっています。動物の命を支えるお仕事に興味がある方は、ぜひじっくり見てくださいね。" }
+      { speaker: "guide2", name: "りく", text: "ここでの学びは、国家資格「愛玩動物看護師」を目指す道にもつながっています。動物の命を支える仕事に興味がある人は、ぜひじっくり見てください！" }
     ]
   },
   {
@@ -468,12 +499,12 @@ const AREAS = [
     photo: "photos/classroom.jpg",
     unlocked: true,
     lines: [
-      { speaker: "guide", name: "みお先生", text: "最後は教室です。座学の授業はこのお部屋で行います。田中先生、いま授業中ですか？" },
+      { speaker: "guide2", name: "りく", text: "続いては教室です。座学の授業はこの部屋で受けています。田中先生、いま授業中ですか？" },
       { speaker: "teacher", char: "tanaka", name: "田中先生（教務）", text: "おや、みなさんようこそ。ちょうど犬学の授業中ですよ。犬の体のしくみ、動物行動学、ペットビジネスまで、座学では幅広く学びます。" },
       { speaker: "teacher", char: "tanaka", name: "田中先生（教務）", text: "「なぜ？」を教室で学んで、実習室で「なるほど！」と確かめる。この繰り返しが、プロへのいちばんの近道なんです。" },
-      { speaker: "guide", name: "みお先生", text: "クラスは質問しやすい雰囲気で、同じ夢を持つ仲間ともすぐ仲良くなれますよ。…あら？ マロン？" },
+      { speaker: "guide", name: "あかり", text: "クラスは質問しやすい雰囲気で、同じ夢を持つ仲間ともすぐ仲良くなれますよ。…あれ？ マロン？" },
       { speaker: "dog", name: "マロン", text: "すぴー…（授業の声、きもちいい…）" },
-      { speaker: "guide", name: "みお先生", text: "もう、マロンったら！ ふふ、こんなふうに犬たちと一緒に、のびのび学べる学校です♪" }
+      { speaker: "guide", name: "あかり", text: "もう、マロンったら！ ふふ、こんなふうに犬たちと一緒に、のびのび学べる学校です♪" }
     ]
   },
   {
@@ -484,12 +515,14 @@ const AREAS = [
     photo: "photos/finale.jpg",
     unlocked: true,
     lines: [
-      { speaker: "guide", name: "みお先生", text: "これでバーチャルオープンキャンパスはおしまいです。最後に、先生たちからメッセージがあります！" },
+      { speaker: "guide", name: "あかり", text: "これでバーチャルオープンキャンパスはおしまいです。最後に、先生たちからメッセージがあります！" },
       { speaker: "teacher", char: "tanaka", name: "田中先生（教務）", text: "本日はご来場ありがとうございました。実際の学校では、授業見学や個別相談もできますよ。" },
+      { speaker: "teacher", char: "mio", name: "みお先生（トリマー担当）", text: "トリマー志望のみなさん、実習室でシザーの持ち方から丁寧に教えます。一緒にふわふわを作りましょうね✂️" },
       { speaker: "teacher", char: "daichi", name: "大地先生（トレーニング担当）", text: "次は本物のワンちゃんたちと一緒に待ってるぞ！ 体験実習、燃えるぞー！" },
       { speaker: "teacher", char: "sakura", name: "さくら先生（動物看護担当）", text: "かわいいモデル犬たちも、みなさんに会えるのを楽しみにしています♪" },
-      { speaker: "dog", name: "マロン", text: "わんわんっ！（今度は本物のぼくに会いに来てね！）" },
-      { speaker: "guide", name: "みお先生", text: "実地のオープンキャンパスの日程は、学校の公式サイトでご案内しています。それでは、本物の学校でお会いしましょう！ 案内役は、みお先生とマロンでした♪" }
+      { speaker: "dog", name: "マロン", text: "わんわんっ！（今度は本物のわたしに会いに来てね！）" },
+      { speaker: "guide2", name: "りく", text: "実地のオープンキャンパスの日程は、学校の公式サイトで案内しています。それでは、本物の学校で会いましょう！" },
+      { speaker: "guide", name: "あかり", text: "案内役は、あかりとりくと、マロンでした♪ またね！" }
     ]
   }
 ];
@@ -709,6 +742,28 @@ function setPanorama(area) {
 // 新しい先生を作る時：ここにSVGを追加し、セリフに char: "キー" を付ける
 // ================================================================
 const TEACHER_CHARS = {
+  // みお先生（トリマー担当）：明るい系。紫グルーミングエプロン＋シザー
+  mio: `<svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">
+    <path d="M28 42 Q26 90 34 100 L86 100 Q94 90 92 42 Z" fill="#6B4A2F"/>
+    <circle cx="60" cy="46" r="26" fill="#FCD9B8"/>
+    <path d="M34 42 Q36 18 60 18 Q84 18 86 42 Q74 34 60 36 Q46 34 34 42 Z" fill="#7C5A3A"/>
+    <circle cx="51" cy="48" r="3" fill="#18181B"/>
+    <circle cx="69" cy="48" r="3" fill="#18181B"/>
+    <path d="M54 57 Q60 62 66 57" stroke="#18181B" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="45" cy="55" r="4" fill="#F9A8C0" opacity="0.7"/>
+    <circle cx="75" cy="55" r="4" fill="#F9A8C0" opacity="0.7"/>
+    <path d="M40 74 Q60 68 80 74 L86 118 Q60 124 34 118 Z" fill="#7C3AED"/>
+    <path d="M46 76 Q60 72 74 76 L78 112 Q60 116 42 112 Z" fill="#fff"/>
+    <line x1="56" y1="95" x2="62" y2="85" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="62" y1="95" x2="56" y2="85" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="62" cy="85" r="2.5" fill="none" stroke="#94A3B8" stroke-width="1.8"/>
+    <circle cx="56" cy="85" r="2.5" fill="none" stroke="#CBD5E1" stroke-width="1.8"/>
+    <rect x="52" y="94" width="16" height="12" rx="3" fill="#7C3AED"/>
+    <path d="M80 78 Q98 70 102 56" stroke="#FCD9B8" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <path d="M40 78 Q30 92 32 102" stroke="#FCD9B8" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <rect x="46" y="118" width="10" height="22" rx="5" fill="#3F3F46"/>
+    <rect x="64" y="118" width="10" height="22" rx="5" fill="#3F3F46"/>
+  </svg>`,
   // 田中先生（教務）：穏やか系。カーディガン＋ネクタイ＋丸メガネ
   tanaka: `<svg viewBox="0 0 120 155" xmlns="http://www.w3.org/2000/svg">
     <circle cx="60" cy="42" r="25" fill="#F5CBA7"/>
@@ -782,8 +837,10 @@ const TEACHER_CHARS = {
 // 生成方法は「画像生成ガイド.md」を参照
 // ================================================================
 const CHAR_IMAGES = {
-  guide:  "chars/mio.png",     // みお先生
+  guide:  "chars/akari.png",   // あかり（女子学生・案内役）
+  guide2: "chars/riku.png",    // りく（男子学生・案内役）
   dog:    "chars/maron.png",   // マロン
+  mio:    "chars/mio.png",     // みお先生（トリマー担当）
   tanaka: "chars/tanaka.png",  // 田中先生（教務）
   daichi: "chars/daichi.png",  // 大地先生（トレーニング）
   sakura: "chars/sakura.png"   // さくら先生（動物看護）
@@ -812,6 +869,7 @@ const el = {
   nextAreaBtn: document.getElementById("nextAreaBtn"),
   teacher: document.getElementById("teacher"),
   guide: document.getElementById("guide"),
+  guide2: document.getElementById("guide2"),
   dog: document.getElementById("dog"),
   mapOverlay: document.getElementById("mapOverlay"),
   mapGrid: document.getElementById("mapGrid")
@@ -838,6 +896,7 @@ function showLine() {
   el.speakerName.className = "";
   if (line.speaker === "teacher") el.speakerName.classList.add("teacher-tag");
   if (line.speaker === "dog") el.speakerName.classList.add("dog-tag");
+  if (line.speaker === "guide2") el.speakerName.classList.add("guide2-tag");
   el.dialogText.textContent = line.text;
 
   // 先生のセリフになったら、そのキャラの見た目で登場させる
@@ -851,8 +910,8 @@ function showLine() {
   }
 
   // しゃべる人をぴょこっと動かす
-  [el.guide, el.dog, el.teacher].forEach(c => c.classList.remove("talking"));
-  const talker = line.speaker === "guide" ? el.guide : line.speaker === "dog" ? el.dog : el.teacher;
+  [el.guide, el.guide2, el.dog, el.teacher].forEach(c => c.classList.remove("talking"));
+  const talker = { guide: el.guide, guide2: el.guide2, dog: el.dog, teacher: el.teacher }[line.speaker] || el.guide;
   talker.classList.add("talking");
   setTimeout(() => talker.classList.remove("talking"), 500);
 }
@@ -905,6 +964,7 @@ function closeMap() {
 // スタート
 initPano();
 applyCharImage(el.guide, CHAR_IMAGES.guide);
+applyCharImage(el.guide2, CHAR_IMAGES.guide2);
 applyCharImage(el.dog, CHAR_IMAGES.dog);
 loadArea(0);
 </script>
