@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>バーチャルオープンキャンパス｜〇〇動物専門学校</title>
 <style>
   :root {
@@ -741,22 +741,47 @@ function makePlaceholderPano(area) {
   return c;
 }
 
+// 360度写真は area.photo をキーにキャッシュする。
+// エリア移動のたびに毎回読み込み直すと、切替の瞬間に仮背景が一瞬見えてしまうため、
+// ページ読み込み時に全エリア分を先読みしておき、2回目以降の表示はキャッシュから即座に出す。
+const panoCache = {};
+
+function toPOTCanvas(img) {
+  // WebGL1は2の累乗サイズしか扱えないため、どんな画像が来ても
+  // 2:1の累乗キャンバスに描き直してから使う（サイズ・比率は自由でOK）
+  const max = gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 2048;
+  const w = max >= 4096 ? 4096 : 2048;
+  const pot = document.createElement("canvas");
+  pot.width = w;
+  pot.height = w / 2;
+  pot.getContext("2d").drawImage(img, 0, 0, pot.width, pot.height);
+  return pot;
+}
+
+function preloadPanoramas() {
+  AREAS.forEach(area => {
+    if (!area.photo || panoCache[area.photo]) return;
+    const img = new Image();
+    img.onload = () => { panoCache[area.photo] = toPOTCanvas(img); };
+    img.src = area.photo;
+  });
+}
+
 function setPanorama(area) {
   yaw = 0; pitch = 0; autoRotate = true;
-  // まず仮背景を表示し、photo のファイルが実在すれば読み込み完了後に差し替える
+  if (area.photo && panoCache[area.photo]) {
+    // 先読み済みならちらつきなく即座に実写へ
+    setPanoTexture(panoCache[area.photo]);
+    return;
+  }
+  // 先読みが間に合っていない時だけ、仮背景→読み込み完了後に差し替え
   // （ファイルがまだ無くてもエラーにならず仮背景のまま動く）
   setPanoTexture(makePlaceholderPano(area));
   if (area.photo) {
     const img = new Image();
     img.onload = () => {
-      // WebGL1は2の累乗サイズしか扱えないため、どんな画像が来ても
-      // 2:1の累乗キャンバスに描き直してから使う（サイズ・比率は自由でOK）
-      const max = gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 2048;
-      const w = max >= 4096 ? 4096 : 2048;
-      const pot = document.createElement("canvas");
-      pot.width = w;
-      pot.height = w / 2;
-      pot.getContext("2d").drawImage(img, 0, 0, pot.width, pot.height);
+      const pot = toPOTCanvas(img);
+      panoCache[area.photo] = pot;
       setPanoTexture(pot);
     };
     img.src = area.photo;
@@ -999,6 +1024,7 @@ function closeMap() {
 
 // スタート
 initPano();
+preloadPanoramas();
 applyCharImage(el.guide, CHAR_IMAGES.guide);
 applyCharImage(el.guide2, CHAR_IMAGES.guide2);
 applyCharImage(el.dog, CHAR_IMAGES.dog);
