@@ -1,0 +1,28 @@
+# Slide Maker 設定ファイル
+version: 1
+user_type: minimal
+
+setup:
+  completed: true
+  date: "2026-07-11"
+
+output_formats:
+  - html_deck   # 同梱テンプレート使用・追加インストール不要
+
+design:
+  tendency: friendly  # やさしい・親しみやすい（動物系サロンオーナー向け）
+  notes: 温かみのある配色・専門用語控えめ。法務題材でも堅くしすぎない
+
+typical_slide_types:
+  - portfolio   # 案件獲得用ポートフォリオ
+  - proposal    # 提案資料
+
+workspace:
+  base_path: "./work/slide-maker"
+
+peer_agents:
+  enabled: false  # 連携は毎回ユーザー承認
+
+integration_research:
+  last_checked: ""
+  notes: HTMLデッキは同梱テンプレのため外部ツール調査不要
