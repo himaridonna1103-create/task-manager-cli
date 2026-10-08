@@ -134,6 +134,19 @@ h2 .sm{display:block;font-size:11.5px;font-family:Inter,sans-serif;
   border-radius:14px;padding:13px 15px;font-size:13.5px;line-height:1.75;
 }
 
+/* ===== デモ ===== */
+.demo{background:var(--pink);color:#fff;}
+.demo h2 .sm{color:rgba(255,255,255,.82);}
+.demo-lead{font-size:14px;line-height:1.8;margin-bottom:16px;}
+.demo-lead b{font-weight:700;}
+.btn-demo{
+  background:#fff;color:var(--ink);
+  padding:17px 18px;font-size:17px;border-radius:16px;
+  box-shadow:0 5px 14px rgba(0,0,0,.14);margin-bottom:0;
+}
+.btn-demo span{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:4px;}
+.demo-note{margin-top:13px;font-size:12px;line-height:1.75;opacity:.92;}
+
 /* ===== 料金 ===== */
 .price-wrap{background:var(--yellow);}
 .price-wrap h2{text-align:center;}
@@ -321,6 +334,16 @@ footer a{color:var(--muted);}
     <div class="close">
       外から来て教えるコンサルタントではありません。<b>同じように店を回しながら、自分で使っているもの</b>をそのままお渡しします。うまくいかなかったことも、正直にお話しします。
     </div>
+  </section>
+
+  <section class="block demo">
+    <h2><span class="sm">TRY IT</span>作ったもの、<br>触ってみてください</h2>
+    <p class="demo-lead">グルーミングサロン専用のAI秘書「<b>ひまりちゃん</b>」を作って公開しています。カウンセリングメモ、お礼メール、SNSの投稿文。実際に動くものです。</p>
+    <a class="btn btn-demo" href="https://himari-chan.streamlit.app/" target="_blank" rel="noopener">
+      ひまりちゃんを開く
+      <span>無料・登録不要でそのまま使えます</span>
+    </a>
+    <p class="demo-note">※ しばらく誰も使っていないと、お休み状態になっています。英語で「Yes, get this app back up!」と出たら、それを押してください。30秒ほどで起きます。</p>
   </section>
 
   <section class="block price-wrap">
