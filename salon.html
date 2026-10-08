@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>閉店後の1時間を、返します｜トリミングサロンのAI伴走サポート｜ひまり AI Design</title>
+<meta name="description" content="閉店後のカルテ書き、施術中のLINE対応。同じくサロンを経営しているトリマーが、AIで「やらなくていい作業」を減らします。モニター3店舗限定・月15,000円。">
+<meta property="og:title" content="閉店後の1時間を、返します｜トリミングサロンのAI伴走サポート">
+<meta property="og:description" content="トリミングサロンを経営しながら、自分の店で使っている仕組みをそのままお渡しします。モニター3店舗限定・月15,000円。">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --purple:#7C3AED;
+  --blue:#2563EB;
+  --yellow:#FACC15;
+  --green:#22C55E;
+  --pink:#EC4899;
+  --bg:#F4F4F6;
+  --ink:#18181B;
+  --muted:#52525B;
+  --line:#E4E4E7;
+  --pad:20px;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  line-height:1.8;
+  font-size:15px;
+  padding-bottom:calc(76px + env(safe-area-inset-bottom, 0px));
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;}
+[hidden]{display:none!important;}
+.wrap{max-width:560px;margin:0 auto;padding:0 var(--pad);}
+section{margin-top:18px;}
+
+/* ===== ヒーロー ===== */
+.hero{
+  background:var(--purple);color:#fff;
+  border-radius:0 0 32px 32px;
+  padding:calc(26px + env(safe-area-inset-top, 0px)) var(--pad) 30px;
+  text-align:left;
+}
+.hero .brand{
+  font-family:Inter,sans-serif;font-size:10.5px;letter-spacing:.16em;
+  opacity:.85;font-weight:600;
+}
+.hero .badge{
+  display:inline-block;background:var(--yellow);color:var(--ink);
+  font-size:11.5px;font-weight:700;border-radius:999px;
+  padding:5px 13px;margin:14px 0 12px;
+}
+.hero h1{
+  font-size:28px;font-weight:700;line-height:1.45;letter-spacing:-.01em;
+}
+.hero h1 .accent{
+  background:linear-gradient(transparent 62%, rgba(250,204,21,.45) 62%);
+}
+.hero .sub{font-size:14px;margin-top:14px;opacity:.95;}
+.hero .who{
+  margin-top:18px;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.28);
+  font-size:12.5px;opacity:.92;line-height:1.7;
+}
+
+/* ===== 共通 ===== */
+h2{
+  font-size:20px;font-weight:700;line-height:1.5;
+  margin-bottom:14px;
+}
+h2 .sm{display:block;font-size:11.5px;font-family:Inter,sans-serif;
+  letter-spacing:.14em;color:var(--purple);font-weight:700;margin-bottom:5px;}
+.block{border-radius:28px;padding:26px 22px;}
+.card{background:#fff;border-radius:20px;padding:18px 18px;}
+.lead{font-size:14.5px;}
+
+/* ===== 悩み ===== */
+.pains{display:grid;gap:10px;margin-top:4px;}
+.pain{
+  background:#fff;border-radius:18px;padding:15px 17px;
+  display:flex;gap:12px;align-items:flex-start;
+}
+.pain .ic{
+  flex:0 0 34px;height:34px;border-radius:50%;
+  background:var(--bg);display:grid;place-items:center;
+  font-size:17px;line-height:1;
+}
+.pain p{font-size:14px;line-height:1.7;}
+.pains-note{
+  margin-top:14px;font-size:13.5px;font-weight:500;
+  text-align:center;color:var(--purple);
+}
+
+/* ===== 3ヶ月 ===== */
+.flow{display:grid;gap:12px;}
+.step{background:#fff;border-radius:20px;padding:18px 18px;position:relative;}
+.step .no{
+  font-family:Inter,sans-serif;font-size:10px;font-weight:700;color:#fff;
+  background:var(--purple);border-radius:999px;padding:3px 11px;display:inline-block;
+}
+.step:nth-child(2) .no{background:var(--blue);}
+.step:nth-child(3) .no{background:var(--pink);}
+.step h3{font-size:16.5px;font-weight:700;margin:9px 0 7px;line-height:1.5;}
+.step p{font-size:13.5px;color:var(--muted);line-height:1.75;}
+.step .win{
+  margin-top:11px;padding:8px 12px;border-radius:12px;
+  background:#F0FDF4;color:#166534;font-size:13px;font-weight:500;
+}
+
+/* ===== なぜ私か ===== */
+.why{background:var(--blue);color:#fff;}
+.why h2 .sm{color:rgba(255,255,255,.8);}
+.why ul{list-style:none;margin-top:4px;}
+.why li{
+  font-size:14px;line-height:1.75;padding:11px 0;
+  border-bottom:1px solid rgba(255,255,255,.22);
+  display:flex;gap:10px;align-items:flex-start;
+}
+.why li:last-child{border-bottom:none;}
+.why li b{display:block;font-size:15px;margin-bottom:2px;}
+.why li .n{
+  font-family:Inter,sans-serif;font-weight:700;font-size:12px;
+  opacity:.7;flex:0 0 auto;padding-top:3px;
+}
+.why .close{
+  margin-top:14px;background:rgba(255,255,255,.14);
+  border-radius:14px;padding:13px 15px;font-size:13.5px;line-height:1.75;
+}
+
+/* ===== 料金 ===== */
+.price-wrap{background:var(--yellow);}
+.price-wrap h2{text-align:center;}
+.price-wrap h2 .sm{color:#854D0E;}
+.pricebox{
+  background:#fff;border-radius:22px;padding:22px 20px;text-align:center;
+}
+.pricebox .cap{
+  display:inline-block;background:var(--ink);color:#fff;
+  font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 14px;
+}
+.pricebox .amt{
+  font-family:Inter,sans-serif;font-weight:700;
+  font-size:46px;line-height:1.1;color:var(--purple);margin:12px 0 2px;
+  letter-spacing:-.02em;
+}
+.pricebox .amt small{font-size:17px;font-weight:600;letter-spacing:0;}
+.pricebox .term{font-size:13.5px;color:var(--muted);}
+.pricebox .init{
+  margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);
+  font-size:14px;
+}
+.pricebox .init b{color:var(--purple);font-size:16px;}
+.pricebox .init s{color:#A1A1AA;font-size:13px;}
+.escape{
+  margin-top:12px;background:#fff;border-radius:18px;
+  padding:15px 17px;font-size:14px;line-height:1.75;
+  border:2px solid var(--ink);
+}
+.escape b{display:block;font-size:15px;margin-bottom:4px;}
+
+/* ===== 含む・含まない ===== */
+.scope{display:grid;gap:10px;}
+.sbox{border-radius:18px;padding:16px 17px;}
+.sbox.in{background:#F3F0FF;}
+.sbox.out{background:#fff;border:1px solid var(--line);}
+.sbox h4{font-size:14px;font-weight:700;margin-bottom:8px;}
+.sbox.in h4{color:var(--purple);}
+.sbox.out h4{color:var(--muted);}
+.sbox ul{list-style:none;}
+.sbox li{font-size:13.5px;line-height:1.75;padding-left:17px;position:relative;}
+.sbox.in li::before{content:"\2713";position:absolute;left:0;color:var(--purple);font-weight:700;}
+.sbox.out li::before{content:"\2013";position:absolute;left:2px;color:#A1A1AA;font-weight:700;}
+
+/* ===== 個人情報 ===== */
+.privacy{background:var(--green);color:#063D20;border-radius:24px;padding:20px 20px;}
+.privacy b{display:block;font-size:16px;font-weight:700;margin-bottom:6px;}
+.privacy p{font-size:13.5px;line-height:1.75;}
+
+/* ===== FAQ ===== */
+.faq details{
+  background:#fff;border-radius:16px;margin-bottom:9px;overflow:hidden;
+}
+.faq summary{
+  cursor:pointer;list-style:none;padding:15px 44px 15px 17px;
+  font-size:14.5px;font-weight:500;position:relative;line-height:1.6;
+}
+.faq summary::-webkit-details-marker{display:none;}
+.faq summary::after{
+  content:"+";position:absolute;right:17px;top:50%;transform:translateY(-50%);
+  font-size:20px;color:var(--purple);font-weight:700;line-height:1;
+}
+.faq details[open] summary::after{content:"\2013";}
+.faq .a{padding:0 17px 16px;font-size:13.5px;color:var(--muted);line-height:1.8;}
+
+/* ===== CTA ===== */
+.cta{
+  background:var(--purple);color:#fff;border-radius:32px;
+  padding:28px 22px;text-align:center;margin-top:22px;
+}
+.cta h2{font-size:21px;margin-bottom:8px;}
+.cta .lead{font-size:14px;opacity:.95;margin-bottom:18px;}
+.btn{
+  display:block;text-decoration:none;border-radius:16px;
+  padding:16px 18px;font-weight:700;font-size:16px;margin-bottom:10px;
+  transition:transform .12s ease;
+}
+.btn:active{transform:scale(.985);}
+.btn-line{background:#06C755;color:#fff;}
+.btn-line span{display:block;font-size:11.5px;font-weight:400;opacity:.9;margin-top:3px;}
+.btn-mail{background:#fff;color:var(--ink);}
+.btn-mail span{display:block;font-size:11.5px;font-weight:400;color:var(--muted);margin-top:3px;}
+.cta .links{
+  margin-top:16px;padding-top:15px;border-top:1px solid rgba(255,255,255,.25);
+  font-size:13px;
+}
+.cta .links a{color:#fff;text-decoration:underline;text-underline-offset:3px;}
+.cta .note{font-size:12px;opacity:.85;margin-top:12px;line-height:1.7;}
+
+/* ===== フッター ===== */
+footer{
+  text-align:center;padding:26px var(--pad) 10px;
+  font-size:12px;color:var(--muted);line-height:1.8;
+}
+footer a{color:var(--muted);}
+
+/* ===== 固定バー ===== */
+.fixbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);
+  padding:10px var(--pad) calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.fixbar .inner{max-width:560px;margin:0 auto;display:flex;gap:10px;align-items:center;}
+.fixbar .txt{flex:1;font-size:11.5px;line-height:1.5;color:var(--muted);}
+.fixbar .txt b{display:block;color:var(--ink);font-size:13px;}
+.fixbar a{
+  flex:0 0 auto;background:#06C755;color:#fff;text-decoration:none;
+  border-radius:12px;padding:12px 18px;font-weight:700;font-size:14px;
+}
+
+@media (min-width:600px){
+  body{font-size:16px;}
+  .hero h1{font-size:32px;}
+  .scope{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap" style="padding:0">
+    <div class="brand">HIMARI AI DESIGN</div>
+    <span class="badge">モニター 3店舗限定</span>
+    <h1>閉店後の1時間、<br><span class="accent">まだカルテを</span><br><span class="accent">書いていませんか。</span></h1>
+    <p class="sub">同じようにサロンを経営している人間が、AIを使って「やらなくていい作業」を減らします。接客と施術に、時間を戻すための3ヶ月です。</p>
+    <div class="who">
+      ひまり｜トリミングサロン経営<br>
+      動物系専門学校 講師（グルーミング）・AI活用支援
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <h2><span class="sm">YOUR DAY</span>こんなこと、ありませんか？</h2>
+    <div class="pains">
+      <div class="pain"><div class="ic">📝</div><p>閉店後、カルテと引き継ぎメモを書くのに<b>30分〜1時間</b>かかっている</p></div>
+      <div class="pain"><div class="ic">📱</div><p>施術中に届いたLINEの予約確認、<b>あとで返そうと思って忘れる</b></p></div>
+      <div class="pain"><div class="ic">💭</div><p>Instagram、<b>投稿ネタを考えるところで毎回止まる</b></p></div>
+      <div class="pain"><div class="ic">📊</div><p>リピート率も客単価も、<b>正直きちんと把握できていない</b></p></div>
+    </div>
+    <p class="pains-note">どれも、私の店で起きていることです。<br>そして、仕組みで減らせます。</p>
+  </section>
+
+  <section>
+    <h2><span class="sm">3 MONTHS</span>3ヶ月でやること</h2>
+    <div class="flow">
+      <div class="step">
+        <span class="no">MONTH 1</span>
+        <h3>一番しんどい作業を、1つなくす</h3>
+        <p>お店の数字を一緒に記録してから、カルテ・引き継ぎメモの作成をAIに任せる形へ。使えるようになるまで、横について並走します。</p>
+        <div class="win">→ 閉店後の時間が返ってきます</div>
+      </div>
+      <div class="step">
+        <span class="no">MONTH 2</span>
+        <h3>リピートと客単価の設計</h3>
+        <p>カルテを使った次回のご提案の型、次回予約のお声がけ、メニューと価格の見直しを一緒に組み立てます。</p>
+        <div class="win">→ 次回予約が取れはじめます</div>
+      </div>
+      <div class="step">
+        <span class="no">MONTH 3</span>
+        <h3>数字が見える状態にしてお渡し</h3>
+        <p>InstagramとGoogleマップの導線を整理。毎月の数字をご自身で確認できる仕組みをお渡しして終わります。</p>
+        <div class="win">→ 自分の店の数字が分かるようになります</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block why">
+    <h2><span class="sm">WHY ME</span>なぜ、私なのか</h2>
+    <ul>
+      <li><span class="n">01</span><span><b>サロンを経営しています</b>私自身がトリミングサロンの経営者です。閉店後に残ってカルテを書く時間も、施術中に鳴るスマホも、毎日のことです。</span></li>
+      <li><span class="n">02</span><span><b>教えることが本業です</b>動物系専門学校でグルーミングを教えています。「どう伝えたら伝わるか」を毎日考えています。</span></li>
+      <li><span class="n">03</span><span><b>AIを自分で作れます</b>サロン業務用のAIを自分で開発して、自分の店で動かしています。試していないものはお渡ししません。</span></li>
+    </ul>
+    <div class="close">
+      外から来て教えるコンサルタントではありません。<b>同じように店を回しながら、自分で使っているもの</b>をそのままお渡しします。うまくいかなかったことも、正直にお話しします。
+    </div>
+  </section>
+
+  <section class="block price-wrap">
+    <h2><span class="sm">MONITOR PRICE</span>モニター価格</h2>
+    <div class="pricebox">
+      <span class="cap">3店舗限定</span>
+      <div class="amt">15,000<small>円 / 月</small></div>
+      <div class="term">3ヶ月間／月2回のオンライン＋チャット相談</div>
+      <div class="init">
+        初期費用 <b>0円</b> <s>通常150,000円</s>
+      </div>
+    </div>
+    <div class="escape">
+      <b>1ヶ月目で、やめられます。</b>
+      1ヶ月やってみて「合わないな」と思ったら、そこで終わっていただいて大丈夫です。残りの料金はいただきません。
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="sm">SCOPE</span>やること・やらないこと</h2>
+    <div class="scope">
+      <div class="sbox in">
+        <h4>含まれるもの</h4>
+        <ul>
+          <li>月2回のオンライン打ち合わせ（各60分）</li>
+          <li>チャット相談（回数制限なし／営業日24時間以内に返信）</li>
+          <li>AIの初期設定と、お店に合わせた調整</li>
+          <li>毎月の数字まとめ</li>
+          <li>3ヶ月終了時のレポート</li>
+        </ul>
+      </div>
+      <div class="sbox out">
+        <h4>含まれないもの</h4>
+        <ul>
+          <li>SNS投稿・カルテ入力・電話対応などの代行</li>
+          <li>AIツールの利用料（実費はサロン様ご負担）</li>
+          <li>サロンへの訪問（別途ご相談）</li>
+          <li>ホームページ・LPの制作</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="privacy">
+    <b>お客様の情報は、一切お預かりしません。</b>
+    <p>飼い主様のお名前・ご連絡先・ワンちゃんの情報をいただかなくても、業務の見直しはできます。やりとりするのは「作業の手順」と「かかっている時間」だけです。</p>
+  </section>
+
+  <section class="faq">
+    <h2><span class="sm">FAQ</span>よくあるご質問</h2>
+
+    <details>
+      <summary>1人でやっているサロンですが、大丈夫ですか？</summary>
+      <div class="a">はい、むしろ1人のサロン様のほうが効果を実感しやすいです。代わってくれる人がいないぶん、閉店後の作業がそのまま自分の時間を削っているからです。おひとりでも、スタッフさんがいても、どちらでもお受けします。</div>
+    </details>
+
+    <details>
+      <summary>AIを使ったことがありません。難しくないですか？</summary>
+      <div class="a">設定はこちらで全部やります。最初にお願いするのは、いつも書いているカルテを一度見せていただくことだけです。パソコンが苦手でも、スマホが使えれば大丈夫です。</div>
+    </details>
+
+    <details>
+      <summary>忙しくて時間が取れません。</summary>
+      <div class="a">だからこそ、だと思っています。最初に2時間だけいただければ、そのあとは毎日30分前後が返ってくる計算です。私自身も店をやっているので、打ち合わせは営業時間外や定休日が前提です。夜でも合わせられます。</div>
+    </details>
+
+    <details>
+      <summary>3ヶ月のあと、必ず契約しないといけませんか？</summary>
+      <div class="a">いいえ。3ヶ月で終わりにしていただいて構いません。お渡しした仕組みはそのままお使いいただけます。続けたい場合だけ、あらためてご相談ください。</div>
+    </details>
+
+    <details>
+      <summary>なぜこの価格なのですか？</summary>
+      <div class="a">正直にお伝えすると、私がまだ「このサロンでこう変わりました」という事例を持っていないからです。その事例をつくらせていただく代わりに、この価格にしています。結果を掲載させていただく際も、店名を出す／出さないはお選びいただけます。</div>
+    </details>
+
+    <details>
+      <summary>まず話だけ聞いてみたいのですが。</summary>
+      <div class="a">それで大丈夫です。30分だけオンラインでお話しして、その場でお断りいただいても全く問題ありません。むしろ、お店の状況を伺わないうちにお受けするほうが、お互いよくないと思っています。</div>
+    </details>
+  </section>
+
+  <section class="cta" id="contact">
+    <h2>まず30分、<br>話を聞かせてください</h2>
+    <p class="lead">売り込みはしません。お店の一日を聞かせてもらう時間です。その場でお断りいただいて大丈夫です。</p>
+
+    <a class="btn btn-line" href="https://lin.ee/P8q6jgb" target="_blank" rel="noopener">
+      LINEで相談する
+      <span>いちばん早くお返事できます</span>
+    </a>
+    <a class="btn btn-mail" href="mailto:info@himari-ai-design.com?subject=%E3%82%B5%E3%83%AD%E3%83%B3AI%E4%BC%B4%E8%B5%B0%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%81%AE%E4%BB%B6&amp;body=%0A%E3%81%8A%E5%BA%97%E3%81%AE%E5%90%8D%E5%89%8D%EF%BC%9A%0A%E3%81%8A%E5%90%8D%E5%89%8D%EF%BC%9A%0A%E3%82%B9%E3%82%BF%E3%83%83%E3%83%95%E4%BA%BA%E6%95%B0%EF%BC%9A%0A%E3%81%94%E7%9B%B8%E8%AB%87%E3%81%97%E3%81%9F%E3%81%84%E3%81%93%E3%81%A8%EF%BC%9A%0A">
+      メールで相談する
+      <span>info@himari-ai-design.com</span>
+    </a>
+
+    <div class="links">
+      <a href="https://himari-links.mirror-donna.chatgpt.site" target="_blank" rel="noopener">▶ ひまり AI Design の活動を見る（リンク集）</a>
+    </div>
+    <p class="note">動物業界向けのAI活用について、noteで発信しています。<br>どんな人間かを見てから決めていただいて大丈夫です。</p>
+  </section>
+
+</main>
+
+<footer>
+  ひまり AI Design<br>
+  <a href="https://himari-ai-design.com/" target="_blank" rel="noopener">himari-ai-design.com</a>
+</footer>
+
+<div class="fixbar">
+  <div class="inner">
+    <div class="txt"><b>モニター3店舗限定</b>月15,000円・初期0円</div>
+    <a href="https://lin.ee/P8q6jgb" target="_blank" rel="noopener">LINEで相談</a>
+  </div>
+</div>
+
+</body>
+</html>
